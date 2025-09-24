@@ -22,3 +22,104 @@ lerna-debug.log*
 # temp directory
 .temp
 .tmp
+
+# Nuxt.js specific
+.nuxt
+.output
+.nitro
+.cache
+dist
+
+# Frontend dependencies
+frontend/node_modules
+frontend/.nuxt
+frontend/.output
+frontend/dist
+frontend/.nitro
+frontend/.cache
+
+# Frontend build files
+frontend/build
+frontend/.temp
+frontend/.tmp
+
+# Frontend logs
+frontend/logs
+frontend/*.log
+
+# Frontend environment files
+frontend/.env
+frontend/.env.development
+frontend/.env.test
+frontend/.env.production
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Coverage directory used by tools like istanbul
+coverage
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/

@@ -1,0 +1,58 @@
+version: "3.8"
+services:
+  backend:
+    build:
+      context: "."
+      dockerfile: './.docker/local/backend/Dockerfile'
+    container_name: "roommate_be"
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=roommate_db
+      - DATABASE_USER=roommate_user
+      - DATABASE_PASSWORD=roommate_password
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - roommate-network
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: "roommate_postgres"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=roommate_db
+      - POSTGRES_USER=roommate_user
+      - POSTGRES_PASSWORD=roommate_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - roommate-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: "roommate_nginx"
+    ports:
+      - "80:80"
+    volumes:
+      - ./.docker/local/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - backend
+    networks:
+      - roommate-network
+volumes:
+  postgres_data:
+
+networks:
+  roommate-network:
+    driver: bridge

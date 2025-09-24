@@ -1,14 +1,11 @@
-FROM node:20-alpine AS development
-LABEL authors="nguyenquanghieu"
+FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
-
-RUN yarn install && yarn cache clean --force
-
-COPY . .
+# Install dependencies globally
+RUN yarn global add @nestjs/cli
 
 EXPOSE 3000
 
-CMD ["yarn", "start"]
+# Install dependencies when container starts (mounted from host)
+CMD ["sh", "-c", "yarn install && yarn start:dev"]
