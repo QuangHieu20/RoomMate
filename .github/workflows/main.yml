@@ -15,8 +15,6 @@ jobs:
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
-      with:
-        clean: false
 
     - name: 🏗️ Test Build Backend
       run: |
@@ -40,17 +38,10 @@ jobs:
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
-      with:
-       clean: false
 
     - name: 🚀 Deploy to Production
       run: |
         echo "📥 Code already checked out..."
-        
-        # Set environment variables
-        export POSTGRES_DB='${{ vars.POSTGRES_DB }}'
-        export POSTGRES_USER='${{ vars.POSTGRES_USER }}'
-        export POSTGRES_PASSWORD='${{ vars.POSTGRES_PASSWORD}}'
         
         # Stop existing containers
         echo "⏹️ Stopping existing containers..."
