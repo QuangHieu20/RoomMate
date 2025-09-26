@@ -19,15 +19,13 @@ jobs:
     - name: 🏗️ Test Build Backend
       run: |
         echo "🔨 Backend build..."
-        cd backend
-        docker build -f ../.docker/production/backend/Dockerfile .
+        docker build -f .docker/production/backend/Dockerfile -t roommate-backend-test .
         echo "✅ Backend build test passed!"
     
     - name: 🏗️ Test Build Frontend
       run: |
         echo "🔨 Frontend build..."
-        cd frontend
-        docker build -f ../.docker/production/frontend/Dockerfile .
+        docker build -f .docker/production/frontend/Dockerfile -t roommate-frontend-test .
         echo "✅ Frontend build test passed!"
     
     - name: ✅ Build Test Completed
