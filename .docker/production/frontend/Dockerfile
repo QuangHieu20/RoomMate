@@ -5,7 +5,8 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Copy package files for dependency installation (this layer will be cached)
-COPY package.json yarn.lock ./
+COPY package.json ./
+COPY yarn.lock ./
 
 # ==================== DEPENDENCIES STAGE ====================
 FROM base AS dependencies
