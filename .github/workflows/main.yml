@@ -24,6 +24,11 @@ jobs:
       run: |
         docker build -f .docker/production/frontend/Dockerfile .
 
+    - name: 🔧 Fix ownership after Docker builds
+      run: |
+        sudo chown -R hieunq:hieunq ${{ github.workspace }} || true
+        sudo chmod -R 755 ${{ github.workspace }} || true
+
     - name: ✅ Build Test Completed
       run: echo "Build test completed successfully!"
 
@@ -55,6 +60,11 @@ jobs:
         echo "🚀 Building and starting containers..."
         docker-compose -f docker-compose.production.yml build --no-cache
         docker-compose -f docker-compose.production.yml up -d
+        
+        # Fix ownership after Docker operations
+        echo "🔧 Fixing ownership after Docker operations..."
+        sudo chown -R hieunq:hieunq ${{ github.workspace }} || true
+        sudo chmod -R 755 ${{ github.workspace }} || true
         
         # Health check
         echo "🏥 Performing health check..."
