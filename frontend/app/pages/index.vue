@@ -400,7 +400,7 @@ const getPostList = (tab): void => {
             </div>
           </div>
 
-                  <!-- Diện tích(m2) Filter -->
+        <!-- Diện tích(m2) Filter -->
         <div v-show="collapseStates.time" class="px-4 pb-4">
             <span>Diện tích(m2)</span>
             <div class="flex items-center space-x-2">
