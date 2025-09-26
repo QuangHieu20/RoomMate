@@ -1,0 +1,88 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: .docker/production/backend/Dockerfile
+      target: production
+    container_name: "roommate_be_prod"
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=${POSTGRES_DB}
+      - DATABASE_USER=${POSTGRES_USER}
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
+      - FRONTEND_URL=https://todonest.id.vn
+      - API_BASE_URL=https://todonest.id.vn/api
+      - CORS_ORIGIN=https://todonest.id.vn
+    networks:
+      - roommate-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: .docker/production/frontend/Dockerfile
+      target: production
+    container_name: "roommate_fe_prod"
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - NUXT_PUBLIC_BASE_URL=https://todonest.id.vn
+      - NUXT_PUBLIC_API_BASE_URL=https://todonest.id.vn/api
+      - NUXT_HOST=0.0.0.0
+      - NUXT_PORT=3001
+    networks:
+      - roommate-network
+    depends_on:
+      backend:
+        condition: service_started
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: "roommate_postgres_prod"
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/database/init:/docker-entrypoint-initdb.d
+    networks:
+      - roommate-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  nginx:
+    image: nginx:alpine
+    container_name: "roommate_nginx_prod"
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./.docker/production/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/lib/letsencrypt:/var/lib/letsencrypt:ro
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - roommate-network
+
+volumes:
+  postgres_data:
+
+networks:
+  roommate-network:
+    driver: bridge

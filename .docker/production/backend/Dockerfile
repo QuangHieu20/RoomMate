@@ -1,0 +1,63 @@
+# Production Dockerfile for NestJS Backend
+FROM node:20-alpine AS base
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Create app user and group
+RUN addgroup -g 1001 -S nestjs && \
+    adduser -S nestjs -u 1001 -G nestjs
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files for dependency installation
+COPY backend/package.json backend/yarn.lock ./
+
+# ==================== DEPENDENCIES STAGE ====================
+FROM base AS dependencies
+
+# Install all dependencies (including devDependencies for build)
+RUN yarn install --frozen-lockfile --network-timeout 1000000
+
+# ==================== BUILD STAGE ====================
+FROM dependencies AS build
+
+# Copy source code
+COPY backend/ ./
+
+# Build the application
+RUN yarn build && \
+    # Remove source maps and dev files to reduce image size
+    find dist -name "*.map" -delete && \
+    rm -rf src test node_modules/.cache
+
+# ==================== PRODUCTION STAGE ====================
+FROM base AS production
+
+# Install only production dependencies
+RUN yarn install --frozen-lockfile --production --network-timeout 1000000 && \
+    yarn cache clean && \
+    # Remove unnecessary files
+    rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.yarn
+
+# Copy built application from build stage
+COPY --from=build --chown=nestjs:nestjs /app/dist ./dist
+
+# Switch to non-root user
+USER nestjs
+
+# Expose port
+EXPOSE 3000
+
+# Add health check using localhost
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD node -e "require('http').get('https://todonest.id.vn/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => { process.exit(1) })"
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Start the application with proper signal handling
+ENTRYPOINT ["dumb-init", "--"]
+CMD ["node", "dist/main.js"]
