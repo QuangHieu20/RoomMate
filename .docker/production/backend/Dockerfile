@@ -14,7 +14,8 @@ FROM base AS dependencies
 # Install all dependencies (including devDependencies for build)
 # This layer will be cached if package.json and yarn.lock don't change
 RUN --mount=type=cache,target=/root/.yarn \
-    yarn install --frozen-lockfile --network-timeout 1000000
+    yarn install --frozen-lockfile --network-timeout 1000000 && \
+    yarn cache clean
 
 # ==================== BUILD STAGE ====================
 FROM dependencies AS build
@@ -46,7 +47,7 @@ RUN --mount=type=cache,target=/root/.yarn \
     yarn install --frozen-lockfile --production --network-timeout 1000000 && \
     yarn cache clean && \
     # Remove unnecessary files
-    rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.yarn
+    rm -rf /tmp/* /var/cache/apk/* /root/.npm
 
 # Copy built application from build stage
 COPY --from=build /app/dist ./dist
