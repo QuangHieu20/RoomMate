@@ -460,9 +460,6 @@ const getPostList = (tab): void => {
             </div>
             <div class="divider mx-auto"></div>
           </div>
-
-
-
         
           <div v-show="collapseStates.address" class="px-4 pb-4">
             <span>Loại phòng</span>
