@@ -40,6 +40,9 @@ RUN yarn install --frozen-lockfile --production --network-timeout 1000000 && \
 # Copy built application from build stage
 COPY --from=build /app/.output ./
 
+# Set user ID
+USER 1000:1000
+
 # Expose port 80 for frontend
 EXPOSE 80
 

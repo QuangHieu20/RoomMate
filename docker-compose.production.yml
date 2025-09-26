@@ -8,6 +8,7 @@ services:
       target: production
     container_name: "roommate_be_prod"
     restart: always
+    user: "1000:1000"
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -32,6 +33,7 @@ services:
       target: production
     container_name: "roommate_fe_prod"
     restart: always
+    user: "1000:1000"
     environment:
       - NODE_ENV=production
       - NUXT_PUBLIC_BASE_URL=https://todonest.id.vn

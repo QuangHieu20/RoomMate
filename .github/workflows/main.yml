@@ -16,9 +16,16 @@ jobs:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
 
+    - name: 🔧 Get User ID for ownership
+      run: |
+        echo "USER_ID=$(id -u hieunq)" >> $GITHUB_ENV
+        echo "GROUP_ID=$(id -g hieunq)" >> $GITHUB_ENV
+        echo "User ID: $(id -u hieunq)"
+        echo "Group ID: $(id -g hieunq)"
+
     - name: 🏗️ Test Build Backend
       run: |
-        docker build -f .docker/production/backend/Dockerfile  .
+        docker build -f .docker/production/backend/Dockerfile .
 
     - name: 🏗️ Test Build Frontend
       run: |
@@ -26,7 +33,7 @@ jobs:
 
     - name: 🔧 Fix ownership after Docker builds
       run: |
-        sudo chown -R hieunq:hieunq ${{ github.workspace }} || true
+        sudo chown -R ${{ env.USER_ID }}:${{ env.GROUP_ID }} ${{ github.workspace }} || true
         sudo chmod -R 755 ${{ github.workspace }} || true
 
     - name: ✅ Build Test Completed
@@ -43,6 +50,13 @@ jobs:
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
+
+    - name: 🔧 Get User ID for ownership
+      run: |
+        echo "USER_ID=$(id -u hieunq)" >> $GITHUB_ENV
+        echo "GROUP_ID=$(id -g hieunq)" >> $GITHUB_ENV
+        echo "User ID: $(id -u hieunq)"
+        echo "Group ID: $(id -g hieunq)"
 
     - name: 🚀 Deploy to Production
       run: |
@@ -63,7 +77,7 @@ jobs:
         
         # Fix ownership after Docker operations
         echo "🔧 Fixing ownership after Docker operations..."
-        sudo chown -R hieunq:hieunq ${{ github.workspace }} || true
+        sudo chown -R ${{ env.USER_ID }}:${{ env.GROUP_ID }} ${{ github.workspace }} || true
         sudo chmod -R 755 ${{ github.workspace }} || true
         
         # Health check
