@@ -27,8 +27,7 @@ services:
     networks:
       - roommate-network
     depends_on:
-      postgres:
-        condition: service_healthy
+      - postgres
 
   frontend:
     build:
@@ -45,10 +44,6 @@ services:
     user: "1000:1000"
     environment:
       - NODE_ENV=production
-      - NUXT_PUBLIC_BASE_URL=https://todonest.id.vn
-      - NUXT_PUBLIC_API_BASE_URL=https://todonest.id.vn/api
-      - NUXT_HOST=0.0.0.0
-      - NUXT_PORT=80
     networks:
       - roommate-network
     depends_on:

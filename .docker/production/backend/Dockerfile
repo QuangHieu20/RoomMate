@@ -30,8 +30,8 @@ RUN yarn build && \
 # ==================== PRODUCTION STAGE ====================
 FROM node:20-alpine AS production
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init and wget for proper signal handling and health check
+RUN apk add --no-cache dumb-init wget
 
 # Set working directory
 WORKDIR /app
@@ -58,6 +58,10 @@ EXPOSE 3000
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
 # Start the application with proper signal handling
 ENTRYPOINT ["dumb-init", "--"]

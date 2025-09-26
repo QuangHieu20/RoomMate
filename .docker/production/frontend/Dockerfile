@@ -21,6 +21,11 @@ FROM dependencies AS build
 # Copy source code (this layer will be rebuilt when source code changes)
 COPY frontend/ ./
 
+# Set build environment variables
+ENV NODE_ENV=production
+ENV NUXT_PUBLIC_BASE_URL=https://todonest.id.vn
+ENV NUXT_PUBLIC_API_BASE_URL=https://todonest.id.vn/api
+
 # Build the application as static site
 RUN yarn generate && \
     # Remove source maps and dev files to reduce image size
