@@ -1,60 +1,49 @@
 # Production Dockerfile for Nuxt.js Frontend
 FROM node:20-alpine AS base
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
-
 # Set working directory
 WORKDIR /app
 
-# Copy package files for dependency installation
+# Copy package files for dependency installation (this layer will be cached)
 COPY package.json yarn.lock ./
 
 # ==================== DEPENDENCIES STAGE ====================
 FROM base AS dependencies
 
 # Install all dependencies (including devDependencies for build)
+# This layer will be cached if package.json and yarn.lock don't change
 RUN yarn install --frozen-lockfile --network-timeout 1000000
 
 # ==================== BUILD STAGE ====================
 FROM dependencies AS build
 
-# Copy source code
+# Copy source code (this layer will be rebuilt when source code changes)
 COPY . ./
 
-# Build the application
-RUN yarn build && \
+# Build the application as static site
+RUN yarn generate && \
     # Remove source maps and dev files to reduce image size
     find .output -name "*.map" -delete && \
     rm -rf .nuxt node_modules/.cache
 
 # ==================== PRODUCTION STAGE ====================
-FROM node:20-alpine AS production
+FROM nginx:alpine AS production
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
-
-# Set working directory
-WORKDIR /app
-
-# Copy built application from build stage
-COPY --from=build /app/.output ./.output
+# Copy built static files from build stage
+COPY --from=build /app/.output/public /usr/share/nginx/html
 
 # Set user ID
 USER 1000:1000
 
-# Expose port 80 for frontend
+# Expose port 80 for nginx
 EXPOSE 80
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV NUXT_HOST=0.0.0.0
-ENV NUXT_PORT=80
 
-# Add health check using localhost
+# Add health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:80', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => { process.exit(1) })"
+  CMD wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
 
-# Start the application with proper signal handling
-ENTRYPOINT ["dumb-init", "--"]
-CMD ["node", "server/index.mjs"]
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

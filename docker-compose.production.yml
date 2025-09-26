@@ -6,6 +6,10 @@ services:
       context: ./backend
       dockerfile: ../.docker/production/backend/Dockerfile
       target: production
+      cache_from:
+        - node:20-alpine
+      args:
+        BUILDKIT_INLINE_CACHE: 1
     container_name: "roommate_be_prod"
     restart: always
     user: "1000:1000"
@@ -31,6 +35,11 @@ services:
       context: ./frontend
       dockerfile: ../.docker/production/frontend/Dockerfile
       target: production
+      cache_from:
+        - node:20-alpine
+        - nginx:alpine
+      args:
+        BUILDKIT_INLINE_CACHE: 1
     container_name: "roommate_fe_prod"
     restart: always
     user: "1000:1000"

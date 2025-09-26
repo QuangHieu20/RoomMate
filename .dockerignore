@@ -1,14 +1,63 @@
+# Dependencies
 node_modules
 npm-debug.log
+yarn-error.log
+
+# Git
 .git
 .gitignore
+.gitattributes
+
+# Documentation
 README.md
+*.md
+docs/
+
+# Environment files
 .env
-.nyc_output
-coverage
+.env.*
+!.env.example
+
+# IDE files
 .vscode
 .idea
+*.swp
+*.swo
+*~
+
+# Logs
 *.log
-dist
-build
+logs/
+.nyc_output
+
+# Coverage
+coverage/
+.nyc_output
+
+# Build outputs
+dist/
+build/
+.output/
+.nuxt/
+.nitro/
+.cache/
+
+# OS files
 .DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Test files
+test/
+tests/
+__tests__/
+*.test.*
+*.spec.*

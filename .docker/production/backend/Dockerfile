@@ -1,25 +1,23 @@
 # Production Dockerfile for NestJS Backend
 FROM node:20-alpine AS base
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
-
 # Set working directory
 WORKDIR /app
 
-# Copy package files for dependency installation
+# Copy package files for dependency installation (this layer will be cached)
 COPY package.json yarn.lock ./
 
 # ==================== DEPENDENCIES STAGE ====================
 FROM base AS dependencies
 
 # Install all dependencies (including devDependencies for build)
+# This layer will be cached if package.json and yarn.lock don't change
 RUN yarn install --frozen-lockfile --network-timeout 1000000
 
 # ==================== BUILD STAGE ====================
 FROM dependencies AS build
 
-# Copy source code
+# Copy source code (this layer will be rebuilt when source code changes)
 COPY . ./
 
 # Build the application
@@ -37,7 +35,7 @@ RUN apk add --no-cache dumb-init
 # Set working directory
 WORKDIR /app
 
-# Copy package files for production dependencies
+# Copy package files
 COPY package.json yarn.lock ./
 
 # Install only production dependencies
