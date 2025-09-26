@@ -8,7 +8,7 @@ RUN apk add --no-cache dumb-init
 WORKDIR /app
 
 # Copy package files for dependency installation
-COPY frontend/package.json frontend/yarn.lock ./
+COPY package.json yarn.lock ./
 
 # ==================== DEPENDENCIES STAGE ====================
 FROM base AS dependencies
@@ -20,7 +20,7 @@ RUN yarn install --frozen-lockfile --network-timeout 1000000
 FROM dependencies AS build
 
 # Copy source code
-COPY frontend/ ./
+COPY . ./
 
 # Build the application
 RUN yarn build && \
@@ -29,16 +29,16 @@ RUN yarn build && \
     rm -rf .nuxt node_modules/.cache
 
 # ==================== PRODUCTION STAGE ====================
-FROM base AS production
+FROM node:20-alpine AS production
 
-# Install only production dependencies
-RUN yarn install --frozen-lockfile --production --network-timeout 1000000 && \
-    yarn cache clean && \
-    # Remove unnecessary files
-    rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.yarn
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Set working directory
+WORKDIR /app
 
 # Copy built application from build stage
-COPY --from=build /app/.output ./
+COPY --from=build /app/.output ./.output
 
 # Set user ID
 USER 1000:1000

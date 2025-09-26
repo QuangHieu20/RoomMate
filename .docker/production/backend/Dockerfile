@@ -8,7 +8,7 @@ RUN apk add --no-cache dumb-init
 WORKDIR /app
 
 # Copy package files for dependency installation
-COPY backend/package.json backend/yarn.lock ./
+COPY package.json yarn.lock ./
 
 # ==================== DEPENDENCIES STAGE ====================
 FROM base AS dependencies
@@ -20,7 +20,7 @@ RUN yarn install --frozen-lockfile --network-timeout 1000000
 FROM dependencies AS build
 
 # Copy source code
-COPY backend/ ./
+COPY . ./
 
 # Build the application
 RUN yarn build && \
@@ -29,7 +29,16 @@ RUN yarn build && \
     rm -rf src test node_modules/.cache
 
 # ==================== PRODUCTION STAGE ====================
-FROM base AS production
+FROM node:20-alpine AS production
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files for production dependencies
+COPY package.json yarn.lock ./
 
 # Install only production dependencies
 RUN yarn install --frozen-lockfile --production --network-timeout 1000000 && \

@@ -3,8 +3,8 @@ version: "3.8"
 services:
   backend:
     build:
-      context: .
-      dockerfile: .docker/production/backend/Dockerfile
+      context: ./backend
+      dockerfile: ../.docker/production/backend/Dockerfile
       target: production
     container_name: "roommate_be_prod"
     restart: always
@@ -28,8 +28,8 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: .docker/production/frontend/Dockerfile
+      context: ./frontend
+      dockerfile: ../.docker/production/frontend/Dockerfile
       target: production
     container_name: "roommate_fe_prod"
     restart: always
