@@ -4,10 +4,6 @@ FROM node:20-alpine AS base
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
-# Create app user and group
-RUN addgroup -g 1001 -S nuxt && \
-    adduser -S nuxt -u 1001 -G nuxt
-
 # Set working directory
 WORKDIR /app
 
@@ -42,10 +38,7 @@ RUN yarn install --frozen-lockfile --production --network-timeout 1000000 && \
     rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.yarn
 
 # Copy built application from build stage
-COPY --from=build --chown=nuxt:nuxt /app/.output ./
-
-# Switch to non-root user
-USER nuxt
+COPY --from=build /app/.output ./
 
 # Expose port 80 for frontend
 EXPOSE 80

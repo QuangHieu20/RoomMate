@@ -4,10 +4,6 @@ FROM node:20-alpine AS base
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
-# Create app user and group
-RUN addgroup -g 1001 -S nestjs && \
-    adduser -S nestjs -u 1001 -G nestjs
-
 # Set working directory
 WORKDIR /app
 
@@ -42,10 +38,7 @@ RUN yarn install --frozen-lockfile --production --network-timeout 1000000 && \
     rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.yarn
 
 # Copy built application from build stage
-COPY --from=build --chown=nestjs:nestjs /app/dist ./dist
-
-# Switch to non-root user
-USER nestjs
+COPY --from=build /app/dist ./dist
 
 # Expose port
 EXPOSE 3000
