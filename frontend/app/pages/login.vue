@@ -18,7 +18,7 @@
         </h2>
         <p class="text-gray-600 text-sm leading-relaxed">
           Gia nhập cộng đồng <span class="text-blue-600 font-medium">RoomMate</span> của chúng tôi hôm nay<br>
-          Tạo tài khoản để mở ra cơ hội và trải nghiệm mới
+          Tạo tài khoản để mở ra cơ hội và trải nghiệm mới.
         </p>
       </div>
   
