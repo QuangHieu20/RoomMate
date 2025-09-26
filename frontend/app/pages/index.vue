@@ -150,7 +150,7 @@ const getPostList = (tab): void => {
                 </div>
               </div>
               <div class="flex flex-col">
-                <p>Nguyễn Quang Hiếu</p>
+                <p>Nguyễn Quang Híu</p>
                 <span class="text-gray-400 text-xs">1 Giờ</span>
               </div>
             </div>
