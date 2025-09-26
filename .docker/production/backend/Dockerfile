@@ -5,8 +5,8 @@ FROM node:20-alpine AS base
 WORKDIR /app
 
 # Copy package files for dependency installation (this layer will be cached)
-COPY package.json ./
-COPY yarn.lock ./
+COPY backend/package.json ./
+COPY backend/yarn.lock ./
 
 # ==================== DEPENDENCIES STAGE ====================
 FROM base AS dependencies
@@ -19,7 +19,7 @@ RUN yarn install --frozen-lockfile --network-timeout 1000000
 FROM dependencies AS build
 
 # Copy source code (this layer will be rebuilt when source code changes)
-COPY . ./
+COPY backend/ ./
 
 # Build the application
 RUN yarn build && \
@@ -37,8 +37,8 @@ RUN apk add --no-cache dumb-init
 WORKDIR /app
 
 # Copy package files
-COPY package.json ./
-COPY yarn.lock ./
+COPY backend/package.json ./
+COPY backend/yarn.lock ./
 
 # Install only production dependencies
 RUN yarn install --frozen-lockfile --production --network-timeout 1000000 && \

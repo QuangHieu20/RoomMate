@@ -3,8 +3,8 @@ version: "3.8"
 services:
   backend:
     build:
-      context: ./backend
-      dockerfile: ../.docker/production/backend/Dockerfile
+      context: .
+      dockerfile: ./.docker/production/backend/Dockerfile
       target: production
       cache_from:
         - node:20-alpine
@@ -32,8 +32,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: ../.docker/production/frontend/Dockerfile
+      context: .
+      dockerfile: ./.docker/production/frontend/Dockerfile
       target: production
       cache_from:
         - node:20-alpine
