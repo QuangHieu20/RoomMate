@@ -13,7 +13,8 @@ FROM base AS dependencies
 
 # Install all dependencies (including devDependencies for build)
 # This layer will be cached if package.json and yarn.lock don't change
-RUN yarn install --frozen-lockfile --network-timeout 1000000
+RUN --mount=type=cache,target=/root/.yarn \
+    yarn install --frozen-lockfile --network-timeout 1000000
 
 # ==================== BUILD STAGE ====================
 FROM dependencies AS build
@@ -41,7 +42,8 @@ COPY backend/package.json ./
 COPY backend/yarn.lock ./
 
 # Install only production dependencies
-RUN yarn install --frozen-lockfile --production --network-timeout 1000000 && \
+RUN --mount=type=cache,target=/root/.yarn \
+    yarn install --frozen-lockfile --production --network-timeout 1000000 && \
     yarn cache clean && \
     # Remove unnecessary files
     rm -rf /tmp/* /var/cache/apk/* /root/.npm /root/.yarn

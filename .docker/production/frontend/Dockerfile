@@ -13,7 +13,8 @@ FROM base AS dependencies
 
 # Install all dependencies (including devDependencies for build)
 # This layer will be cached if package.json and yarn.lock don't change
-RUN yarn install --frozen-lockfile --network-timeout 1000000
+RUN --mount=type=cache,target=/root/.yarn \
+    yarn install --frozen-lockfile --network-timeout 1000000
 
 # ==================== BUILD STAGE ====================
 FROM dependencies AS build
