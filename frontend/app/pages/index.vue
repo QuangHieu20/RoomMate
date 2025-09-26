@@ -12,10 +12,6 @@ const isLoading = ref(false)
 const collapseStates = ref({
   time: false,
   price: false,
-  area: false,
-  address: false,
-  postTime: false,
-  roomType: false
 })
 
 // Toggle functions for each collapse
