@@ -71,7 +71,6 @@ Thumbs.db
 
 # Package manager files
 package-lock.json
-yarn.lock
 pnpm-lock.yaml
 
 # Coverage directory used by tools like istanbul
