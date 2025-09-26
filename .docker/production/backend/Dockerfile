@@ -50,10 +50,6 @@ USER nestjs
 # Expose port
 EXPOSE 3000
 
-# Add health check using localhost
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD node -e "require('http').get('https://todonest.id.vn/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => { process.exit(1) })"
-
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000

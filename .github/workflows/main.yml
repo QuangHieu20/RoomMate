@@ -1,4 +1,4 @@
-name: RoomMate CI/CD Pipeline
+name: CI/CD Pipeline
 
 on:
   push:
@@ -18,18 +18,14 @@ jobs:
     
     - name: 🏗️ Test Build Backend
       run: |
-        echo "🔨 Backend build..."
-        docker build -f .docker/production/backend/Dockerfile -t roommate-backend-test .
-        echo "✅ Backend build test passed!"
+        docker build -f .docker/production/backend/Dockerfile  .
     
     - name: 🏗️ Test Build Frontend
       run: |
-        echo "🔨 Frontend build..."
-        docker build -f .docker/production/frontend/Dockerfile -t roommate-frontend-test .
-        echo "✅ Frontend build test passed!"
+        docker build -f .docker/production/frontend/Dockerfile .
     
     - name: ✅ Build Test Completed
-      run: echo "🎉 All build tests completed successfully!"
+      run: echo "Build test completed successfully!"
 
   # ==================== DEPLOY ====================
   deploy:
@@ -47,19 +43,6 @@ jobs:
       run: |
         echo "📥 Code already checked out..."
         
-        # Navigate to deployment directory
-        cd /opt/roommate
-        
-        # Set environment variables
-        export POSTGRES_DB='${{ vars.POSTGRES_DB }}'
-        export POSTGRES_USER='${{ vars.POSTGRES_USER }}'
-        export POSTGRES_PASSWORD='${{ vars.POSTGRES_PASSWORD }}'
-        
-        # Update deployment files
-        echo "📋 Updating deployment files..."
-        cp ${{ github.workspace }}/docker-compose.production.yml .
-        cp -r ${{ github.workspace }}/.docker .
-        
         # Stop existing containers
         echo "⏹️ Stopping existing containers..."
         docker-compose -f docker-compose.production.yml down || true
@@ -76,34 +59,9 @@ jobs:
         # Health check
         echo "🏥 Performing health check..."
         sleep 30
-        
-        # Check HTTP health endpoint
-        if curl -f http://localhost/health > /dev/null 2>&1; then
-          echo "✅ HTTP health check passed!"
-        else
-          echo "❌ HTTP health check failed!"
-          docker-compose -f docker-compose.production.yml logs --tail=20
-          exit 1
-        fi
-        
-        # Check HTTPS if Let's Encrypt is configured
-        if [ -d /etc/letsencrypt/live/todonest.id.vn ]; then
-          echo "🔒 Checking HTTPS..."
-          if curl -f -k https://localhost/health > /dev/null 2>&1; then
-            echo "✅ HTTPS health check passed!"
-          else
-            echo "⚠️  HTTPS health check failed (check SSL certificates)"
-          fi
-        else
-          echo "ℹ️  Let's Encrypt certificates not found"
-          echo "ℹ️  Run: sudo certbot certonly --standalone -d todonest.id.vn"
-        fi
+        curl -f http://localhost/health || { echo "Health check failed"; exit 1; }
         
         echo "✅ Deployment completed successfully!"
         echo "🌐 Frontend: https://todonest.id.vn"
         echo "🌐 Backend API: https://todonest.id.vn/api"
         echo "🏥 Health Check: https://todonest.id.vn/health"
-        
-        # Show running containers
-        echo "📋 Running containers:"
-        docker-compose -f docker-compose.production.yml ps

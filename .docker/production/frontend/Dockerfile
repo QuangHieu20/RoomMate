@@ -47,17 +47,17 @@ COPY --from=build --chown=nuxt:nuxt /app/.output ./
 # Switch to non-root user
 USER nuxt
 
-# Expose port 3001 for frontend
-EXPOSE 3001
+# Expose port 80 for frontend
+EXPOSE 80
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV NUXT_HOST=0.0.0.0
-ENV NUXT_PORT=3001
+ENV NUXT_PORT=80
 
 # Add health check using localhost
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD node -e "require('http').get('https://todonest.id.vn/', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => { process.exit(1) })"
+  CMD node -e "require('http').get('http://localhost:80', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => { process.exit(1) })"
 
 # Start the application with proper signal handling
 ENTRYPOINT ["dumb-init", "--"]
