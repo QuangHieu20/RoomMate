@@ -58,6 +58,26 @@ jobs:
         echo "User ID: $(id -u hieunq)"
         echo "Group ID: $(id -g hieunq)"
 
+    - name: 🔐 Setup Environment Variables from GitHub Secrets
+      run: |
+        echo "🔐 Setting up environment variables from GitHub secrets..."
+        
+        # Create .env file from GitHub secrets
+        cat > .env << EOF
+        # Database Configuration from GitHub Secrets
+        POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+        POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+        
+        # Backend Configuration
+        NODE_ENV=production
+        PORT=3000
+        
+        # Frontend Configuration
+        NUXT_PUBLIC_BASE_URL=https://todonest.id.vn
+        NUXT_PUBLIC_API_BASE_URL=https://todonest.id.vn/api
+        EOF
+
     - name: 🚀 Deploy to Production
       run: |
         echo "📥 Code already checked out..."

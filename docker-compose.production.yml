@@ -13,14 +13,16 @@ services:
     container_name: "roommate_be_prod"
     restart: always
     user: "1000:1000"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=production
       - PORT=3000
       - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
-      - DATABASE_NAME=${secrets.POSTGRES_DB}
-      - DATABASE_USER=${secrets.POSTGRES_USER}
-      - DATABASE_PASSWORD=${secrets.POSTGRES_PASSWORD}
+      - DATABASE_NAME=${POSTGRES_DB}
+      - DATABASE_USER=${POSTGRES_USER}
+      - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
       - FRONTEND_URL=https://todonest.id.vn
       - API_BASE_URL=https://todonest.id.vn/api
       - CORS_ORIGIN=https://todonest.id.vn
@@ -54,10 +56,12 @@ services:
     image: postgres:15-alpine
     container_name: "roommate_postgres_prod"
     restart: always
+    env_file:
+      - .env
     environment:
-      - POSTGRES_DB=${secrets.POSTGRES_DB}
-      - POSTGRES_USER=${secrets.POSTGRES_USER}
-      - POSTGRES_PASSWORD=${secrets.POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
