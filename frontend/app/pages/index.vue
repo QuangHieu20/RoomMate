@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {ref} from 'vue'
 import {HandThumbUpIcon, ChatBubbleBottomCenterTextIcon, ShareIcon, ArrowRightIcon} from '@heroicons/vue/24/outline'
+import PostModal from '~/components/PostModal.vue'
 // Page metadata
 definePageMeta({
   title: 'Home - RoomMate'
@@ -48,6 +49,39 @@ const getPostList = (tab): void => {
     isLoading.value = false
   }, 300)
 }
+
+// Post Modal State
+const isPostModalOpen = ref(false)
+const selectedPost = ref(null)
+
+// Open post modal
+const openPostModal = (post) => {
+  selectedPost.value = post
+  isPostModalOpen.value = true
+}
+
+// Close post modal
+const closePostModal = () => {
+  isPostModalOpen.value = false
+  selectedPost.value = null
+}
+
+// Handle post actions
+const handleLike = (postId) => {
+  console.log('Like post:', postId)
+}
+
+const handleComment = (postId, comment) => {
+  console.log('Comment on post:', postId, comment)
+}
+
+const handleShare = (postId) => {
+  console.log('Share post:', postId)
+}
+
+const handleContact = (postId) => {
+  console.log('Contact for post:', postId)
+}
 </script>
 
 <template>
@@ -64,7 +98,8 @@ const getPostList = (tab): void => {
             aria-label="Cho thuê trọ"
             checked="checked"
             @click="getPostList(1)"/>
-        <div  v-show="!isLoading" class="tab-content border-base-300 bg-base-100 p-10 h-[calc(100vh-150px)] overflow-y-auto min-h-0">
+        <div v-show="!isLoading"
+             class="tab-content border-base-300 bg-base-100 p-10 max-h-[calc(100vh-120px)] overflow-y-auto min-h-0">
           <!--  Post List-->
 
           <!--  Video -->
@@ -113,6 +148,24 @@ const getPostList = (tab): void => {
                 </BaseButton>
                 <BaseButton
                     size="xs"
+                    @click="openPostModal({
+            id: 'test',
+            title: 'Tìm phòng trọ Quận 1 hoặc Quận 3, ngân sách 3 triệu',
+            description: 'Mình là sinh viên năm 2, cần tìm 1 phòng trọ hoặc ở ghép gần trung tâm để tiện đi học và làm thêm.',
+            requirements: [
+              'Ngân sách: dưới 3.000.000đ/tháng.',
+              'Yêu cầu: Có WiFi, giờ giấc tự do, WC riêng càng tốt.',
+              'Ưu tiên gần các tuyến bus đi qua trường Đại học Kinh tế.'
+            ],
+            author: {
+              name: 'Nguyễn Quang Hiếu',
+              avatar: 'https://img.daisyui.com/images/profile/demo/yellingcat@192.webp',
+              timestamp: '25/09/2025 12:24 PM'
+            },
+            likes: 0,
+            comments: 14,
+            shares: 52
+          })"
                 >
                   <ChatBubbleBottomCenterTextIcon class="w-5 h-5"/>
                   <span>10</span>
@@ -163,9 +216,9 @@ const getPostList = (tab): void => {
             <!--  Photos -->
             <div class="mt-6">
               <div class="card w-full">
-              <FullBleedCarousel
-                  :images="carouselImages"
-              />
+                <FullBleedCarousel
+                    :images="carouselImages"
+                />
               </div>
             </div>
             <!-- Control -->
@@ -179,12 +232,30 @@ const getPostList = (tab): void => {
                 </BaseButton>
                 <BaseButton
                     size="xs"
+                    @click="openPostModal({
+            id: 'test',
+            title: 'Tìm phòng trọ Quận 1 hoặc Quận 3, ngân sách 3 triệu',
+            description: 'Mình là sinh viên năm 2, cần tìm 1 phòng trọ hoặc ở ghép gần trung tâm để tiện đi học và làm thêm.',
+            requirements: [
+              'Ngân sách: dưới 3.000.000đ/tháng.',
+              'Yêu cầu: Có WiFi, giờ giấc tự do, WC riêng càng tốt.',
+              'Ưu tiên gần các tuyến bus đi qua trường Đại học Kinh tế.'
+            ],
+            author: {
+              name: 'Nguyễn Quang Hiếu',
+              avatar: 'https://img.daisyui.com/images/profile/demo/yellingcat@192.webp',
+              timestamp: '25/09/2025 12:24 PM'
+            },
+            likes: 0,
+            comments: 14,
+            shares: 52
+          })"
                 >
                   <ChatBubbleBottomCenterTextIcon class="w-5 h-5"/>
                   <span>10</span>
                 </BaseButton>
                 <BaseButton
-                  size="xs"
+                    size="xs"
                 >
                   <ShareIcon class="w-5 h-5"/>
                   <span>10</span>
@@ -211,7 +282,8 @@ const getPostList = (tab): void => {
             aria-label="Tìm trọ"
             @click="getPostList(2)"
         />
-        <div v-show="!isLoading" class="tab-content border-base-300 bg-base-100 p-10 rounded-[16px]">
+        <div v-show="!isLoading"
+             class="tab-content border-base-300 bg-base-100 p-10 max-h-[calc(100vh-120px)] overflow-y-auto rounded-[16px]">
           <!--  Post List-->
 
           <!--  Video -->
@@ -356,7 +428,8 @@ const getPostList = (tab): void => {
       <!-- Login/Register Card -->
       <div class="w-[95%] ml-3 card bg-base-100 p-6 mb-8">
         <h2 class="card-title text-xl font-bold mb-2">Đăng nhập hoặc đăng ký RoomMate</h2>
-        <p class="text-base-content/70 mb-4">Kết nối với mọi người, tìm bạn cùng phòng lý tưởng và bắt đầu trò chuyện ngay hôm nay!</p>
+        <p class="text-base-content/70 mb-4">Kết nối với mọi người, tìm bạn cùng phòng lý tưởng và bắt đầu trò chuyện
+          ngay hôm nay!</p>
         <button class="btn w-full bg-cyan-500 hover:bg-cyan-600 border-cyan-500 text-white">
           Đăng nhập hoặc đăng ký
         </button>
@@ -371,41 +444,42 @@ const getPostList = (tab): void => {
 
         <!-- Time Filter -->
         <div class="bg-base-100 rounded-lg mb-4 overflow-hidden">
-          <div 
-            class="p-4 font-bold cursor-pointer flex items-center justify-between"
-            @click="toggleCollapse('time')"
+          <div
+              class="p-4 font-bold cursor-pointer flex items-center justify-between"
+              @click="toggleCollapse('time')"
           >
             <span>Time</span>
-            <svg 
-              class="w-4 h-4 transition-transform duration-200"
-              :class="{ 'rotate-180': collapseStates.time }"
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+            <svg
+                class="w-4 h-4 transition-transform duration-200"
+                :class="{ 'rotate-180': collapseStates.time }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
             >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
           </div>
           <div v-show="collapseStates.time" class="px-4 pb-4">
-            <input type="text" placeholder="Tìm kiếm..." class="input w-full bg-gray-100 border-none focus:outline-none">
+            <input type="text" placeholder="Tìm kiếm..."
+                   class="input w-full bg-gray-100 border-none focus:outline-none">
           </div>
 
-            <!-- Giá thuê Filter -->
+          <!-- Giá thuê Filter -->
           <div v-show="collapseStates.time" class="px-4 pb-4">
             <span>Giá thuê</span>
             <div class="flex items-center space-x-2">
               <input type="text" placeholder="Từ" class="input w-1/2 bg-gray-100 border-none focus:outline-none">
-              <ArrowRightIcon class="w-5 h-5 rounded-full font-bold bg-yellow-100 p-1 text-yellow-500" />
+              <ArrowRightIcon class="w-5 h-5 rounded-full font-bold bg-yellow-100 p-1 text-yellow-500"/>
               <input type="text" placeholder="Đến" class="input w-1/2 bg-gray-100 border-none focus:outline-none">
             </div>
           </div>
 
-        <!-- Diện tích(m2) Filter -->
-        <div v-show="collapseStates.time" class="px-4 pb-4">
+          <!-- Diện tích(m2) Filter -->
+          <div v-show="collapseStates.time" class="px-4 pb-4">
             <span>Diện tích(m2)</span>
             <div class="flex items-center space-x-2">
               <input type="text" placeholder="Từ" class="input w-1/2 bg-gray-100 border-none focus:outline-none">
-              <ArrowRightIcon class="w-5 h-5 rounded-full font-bold bg-yellow-100 p-1 text-yellow-500" />
+              <ArrowRightIcon class="w-5 h-5 rounded-full font-bold bg-yellow-100 p-1 text-yellow-500"/>
               <input type="text" placeholder="Đến" class="input w-1/2 bg-gray-100 border-none focus:outline-none">
             </div>
           </div>
@@ -415,17 +489,17 @@ const getPostList = (tab): void => {
 
         <!-- Địa chỉ Filter -->
         <div class="bg-base-100 rounded-lg mb-4 overflow-hidden">
-          <div 
-            class="p-4 font-bold cursor-pointer flex items-center justify-between"
-            @click="toggleCollapse('address')"
+          <div
+              class="p-4 font-bold cursor-pointer flex items-center justify-between"
+              @click="toggleCollapse('address')"
           >
             <span>Địa chỉ</span>
-            <svg 
-              class="w-4 h-4 transition-transform duration-200"
-              :class="{ 'rotate-180': collapseStates.address }"
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
+            <svg
+                class="w-4 h-4 transition-transform duration-200"
+                :class="{ 'rotate-180': collapseStates.address }"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
             >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
             </svg>
@@ -444,23 +518,24 @@ const getPostList = (tab): void => {
             </select>
           </div>
 
-      
+
           <div v-show="collapseStates.address" class="px-4 pb-4 mt-4">
             <span>Thời điểm đăng bài</span>
             <div class="space-y-2 mt-4 ml-2">
               <label class="flex items-center">
-                <input type="radio" name="post-time" 
-                class="radio bg-transparent border-gray-500 checked:bg-cyan-500 checked:border-cyan-500" checked>
+                <input type="radio" name="post-time"
+                       class="radio bg-transparent border-gray-500 checked:bg-cyan-500 checked:border-cyan-500" checked>
                 <span class="ml-2">Mới nhất</span>
               </label>
               <label class="flex items-center">
-                <input type="radio" name="post-time" class="radio bg-transparent border-gray-500 checked:bg-cyan-500 checked:border-cyan-500">
+                <input type="radio" name="post-time"
+                       class="radio bg-transparent border-gray-500 checked:bg-cyan-500 checked:border-cyan-500">
                 <span class="ml-2">Cũ nhất</span>
               </label>
             </div>
             <div class="divider mx-auto"></div>
           </div>
-        
+
           <div v-show="collapseStates.address" class="px-4 pb-4">
             <span>Loại phòng</span>
             <div class="space-y-2 mt-4 ml-2">
@@ -481,12 +556,24 @@ const getPostList = (tab): void => {
                 <span class="ml-2">Nhà nguyên căn</span>
               </label>
             </div>
-          <div class="divider mx-auto"></div>
+            <div class="divider mx-auto"></div>
 
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Post Modal -->
+    <PostModal
+        :is-open="isPostModalOpen"
+        :post="selectedPost"
+        @close="closePostModal"
+        @update:is-open="isPostModalOpen = $event"
+        @like="handleLike"
+        @comment="handleComment"
+        @share="handleShare"
+        @contact="handleContact"
+    />
   </div>
 </template>
 

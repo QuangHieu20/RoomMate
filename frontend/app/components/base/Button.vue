@@ -32,7 +32,7 @@ const handleClick = (event: MouseEvent) => {
 
 // Computed classes for styling
 const buttonClasses = computed(() => {
-  const baseClasses = 'btn font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2'
+  const baseClasses = 'btn font-medium transition-all duration-200 focus:outline-none'
   
   // Size classes
   const sizeClasses = {
@@ -45,15 +45,15 @@ const buttonClasses = computed(() => {
   
   // Variant classes
   const variantClasses = {
-    default: 'bg-transparent border-none text-gray-700 hover:text-gray-900 focus:ring-gray-500',
-    primary: 'btn-primary bg-blue-500 hover:bg-blue-700 text-white focus:ring-blue-500',
-    secondary: 'btn-secondary bg-gray-500 hover:bg-gray-700 text-white focus:ring-gray-500',
-    success: 'btn-success bg-green-500 hover:bg-green-700 text-white focus:ring-green-500',
-    warning: 'btn-warning bg-yellow-500 hover:bg-yellow-700 text-white focus:ring-yellow-500',
-    error: 'btn-error bg-red-500 hover:bg-red-700 text-white focus:ring-red-500',
-    info: 'btn-info bg-cyan-500 hover:bg-cyan-700 text-white focus:ring-cyan-500',
-    ghost: 'btn-ghost bg-transparent hover:bg-gray-100 text-gray-700 focus:ring-gray-500',
-    outline: 'btn-outline border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white focus:ring-blue-500'
+    default: 'bg-transparent border-none text-gray-700 hover:text-gray-900',
+    primary: 'btn-primary bg-blue-500 hover:bg-blue-700 text-white ',
+    secondary: 'btn-secondary bg-gray-500 hover:bg-gray-700 text-white ',
+    success: 'btn-success bg-green-500 hover:bg-green-700 text-white ',
+    warning: 'btn-warning bg-yellow-500 hover:bg-yellow-700 text-white ',
+    error: 'btn-error bg-red-500 hover:bg-red-700 text-white ',
+    info: 'btn-info bg-cyan-500 hover:bg-cyan-700 text-white ',
+    ghost: 'btn-ghost bg-transparent hover:bg-gray-100 text-gray-700 ',
+    outline: 'btn-outline border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
   }
   
   // State classes
@@ -107,10 +107,6 @@ const buttonClasses = computed(() => {
 /* Other variants with rounded corners */
 .btn:not(.bg-transparent) {
   @apply rounded-lg;
-}
-
-.btn:focus {
-  @apply outline-none ring-2 ring-offset-2;
 }
 
 .btn:disabled {
