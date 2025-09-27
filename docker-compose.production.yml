@@ -12,7 +12,6 @@ services:
         BUILDKIT_INLINE_CACHE: 1
     container_name: "roommate_be_prod"
     restart: always
-    user: "1000:1000"
     env_file:
       - .env
     ports:
@@ -45,7 +44,6 @@ services:
         BUILDKIT_INLINE_CACHE: 1
     container_name: "roommate_fe_prod"
     restart: always
-    user: root
     environment:
       - NODE_ENV=production
     networks:
@@ -76,7 +74,6 @@ services:
 
   nginx:
     image: nginx:alpine
-    user: root
     container_name: "roommate_nginx_prod"
     restart: always
     ports:
