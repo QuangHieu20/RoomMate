@@ -74,6 +74,7 @@ services:
 
   nginx:
     image: nginx:alpine
+    user: root
     container_name: "roommate_nginx_prod"
     restart: always
     ports:
