@@ -40,8 +40,9 @@ FROM nginx:alpine AS production
 # Copy built static files from build stage
 COPY --from=build /app/.output/public /usr/share/nginx/html
 
-# Set user ID
-USER 1000:1000
+# Fix permissions for nginx
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
 
 # Expose port 80 for nginx
 EXPOSE 80
