@@ -1,3 +1,27 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+
+// Reactive data
+const newMessage = ref('')
+
+// Methods
+const sendMessage = () => {
+  if (newMessage.value.trim()) {
+    // TODO: Implement send message logic
+    console.log('Sending message:', newMessage.value)
+    newMessage.value = ''
+  }
+}
+
+// SEO
+useHead({
+  title: 'Chat - RoomMate',
+  meta: [
+    { name: 'description', content: 'Trò chuyện với người dùng khác trên RoomMate' }
+  ]
+})
+</script>
+
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header -->
@@ -44,7 +68,7 @@
 
     <!-- Chat Container -->
     <div class="flex flex-col h-[calc(100vh-80px)]">
-      <!-- Messages Area --> aaa
+      <!-- Messages Area -->
       <div class="flex-1 overflow-y-auto p-6 space-y-4 max-h-[calc(100vh-300px)]">
         <!-- Sample Messages -->
         <div class="flex justify-start">
@@ -130,60 +154,6 @@
             </div>
           </div>
         </div>
-        <div class="flex justify-start">
-          <div class="flex items-start gap-3 max-w-[70%]">
-            <div class="avatar">
-              <div class="w-8 h-8 rounded-full">
-                <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" alt="User" />
-              </div>
-            </div>
-            <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-              <p class="text-gray-900">3.5 triệu/tháng, bao điện nước. Phòng có điều hòa, wifi, nước nóng</p>
-              <p class="text-xs text-gray-500 mt-1">10:36</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex justify-end">
-          <div class="flex items-start gap-3 max-w-[70%] flex-row-reverse">
-            <div class="avatar">
-              <div class="w-8 h-8 rounded-full">
-                <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" alt="Me" />
-              </div>
-            </div>
-            <div class="bg-cyan-500 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm">
-              <p>Nghe ổn đấy! Có thể xem phòng được không?</p>
-              <p class="text-xs text-cyan-100 mt-1">10:38</p>
-            </div>
-          </div>
-        </div>
-        <div class="flex justify-start">
-          <div class="flex items-start gap-3 max-w-[70%]">
-            <div class="avatar">
-              <div class="w-8 h-8 rounded-full">
-                <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" alt="User" />
-              </div>
-            </div>
-            <div class="bg-white rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm">
-              <p class="text-gray-900">3.5 triệu/tháng, bao điện nước. Phòng có điều hòa, wifi, nước nóng</p>
-              <p class="text-xs text-gray-500 mt-1">10:36</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex justify-end">
-          <div class="flex items-start gap-3 max-w-[70%] flex-row-reverse">
-            <div class="avatar">
-              <div class="w-8 h-8 rounded-full">
-                <img src="https://img.daisyui.com/images/profile/demo/yellingcat@192.webp" alt="Me" />
-              </div>
-            </div>
-            <div class="bg-cyan-500 text-white rounded-2xl rounded-tr-sm px-4 py-3 shadow-sm">
-              <p>Nghe ổn đấy! Có thể xem phòng được không?</p>
-              <p class="text-xs text-cyan-100 mt-1">10:38</p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Message Input -->
@@ -224,30 +194,6 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-
-// Reactive data
-const newMessage = ref('')
-
-// Methods
-const sendMessage = () => {
-  if (newMessage.value.trim()) {
-    // TODO: Implement send message logic
-    console.log('Sending message:', newMessage.value)
-    newMessage.value = ''
-  }
-}
-
-// SEO
-useHead({
-  title: 'Chat - RoomMate',
-  meta: [
-    { name: 'description', content: 'Trò chuyện với người dùng khác trên RoomMate' }
-  ]
-})
-</script>
 
 <style scoped>
 /* Custom scrollbar for messages */
