@@ -44,6 +44,8 @@ services:
     container_name: "roommate_fe_prod"
     restart: always
     user: "1000:1000"
+    volumes:
+      - /home/hieunq/roommate_cache/frontend:/var/cache/nginx:rw
     environment:
       - NODE_ENV=production
     networks:
