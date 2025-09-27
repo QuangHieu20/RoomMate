@@ -23,9 +23,9 @@ services:
       - DATABASE_NAME=${POSTGRES_DB}
       - DATABASE_USER=${POSTGRES_USER}
       - DATABASE_PASSWORD=${POSTGRES_PASSWORD}
-      - FRONTEND_URL=https://todonest.id.vn
-      - API_BASE_URL=https://todonest.id.vn/api
-      - CORS_ORIGIN=https://todonest.id.vn
+      - FRONTEND_URL=https://roommate.id.vn
+      - API_BASE_URL=https://roommate.id.vn/api
+      - CORS_ORIGIN=https://roommate.id.vn
     networks:
       - roommate-network
     depends_on:

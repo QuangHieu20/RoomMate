@@ -74,8 +74,8 @@ jobs:
         PORT=3000
         
         # Frontend Configuration
-        NUXT_PUBLIC_BASE_URL=https://todonest.id.vn
-        NUXT_PUBLIC_API_BASE_URL=https://todonest.id.vn/api
+        NUXT_PUBLIC_BASE_URL=https://roommate.id.vn
+        NUXT_PUBLIC_API_BASE_URL=https://roommate.id.vn/api
         EOF
 
     - name: 🚀 Deploy to Production
@@ -106,6 +106,6 @@ jobs:
         curl -f http://localhost/health || { echo "Health check failed"; exit 1; }
         
         echo "✅ Deployment completed successfully!"
-        echo "🌐 Frontend: https://todonest.id.vn"
-        echo "🌐 Backend API: https://todonest.id.vn/api"
-        echo "🏥 Health Check: https://todonest.id.vn/health"
+        echo "🌐 Frontend: https://roommate.id.vn"
+        echo "🌐 Backend API: https://roommate.id.vn/api"
+        echo "🏥 Health Check: https://roommate.id.vn/health"
