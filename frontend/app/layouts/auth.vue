@@ -25,7 +25,5 @@
 </template>
 
 <style scoped>
-.main-form {
 
-}
 </style>
