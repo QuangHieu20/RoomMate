@@ -40,14 +40,6 @@ FROM nginx:alpine AS production
 # Copy built static files from build stage
 COPY --from=build /app/.output/public /usr/share/nginx/html
 
-# Create cache directories and fix permissions
-RUN mkdir -p /var/cache/nginx/client_temp && \
-    mkdir -p /var/cache/nginx/proxy_temp_path && \
-    chown -R 1000:1000 /var/cache/nginx && \
-    chown -R 1000:1000 /usr/share/nginx/html && \
-    chmod -R 755 /var/cache/nginx && \
-    chmod -R 755 /usr/share/nginx/html
-
 # Expose port 80 for nginx
 EXPOSE 80
 
