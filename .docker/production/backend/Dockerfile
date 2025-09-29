@@ -23,6 +23,12 @@ FROM dependencies AS build
 # Copy source code (this layer will be rebuilt when source code changes)
 COPY backend/ ./
 
+# Copy Prisma schema for generation
+COPY backend/prisma ./prisma
+
+# Generate Prisma client before build
+RUN npx prisma generate
+
 # Build the application
 RUN yarn build && \
     # Remove source maps and dev files to reduce image size
@@ -53,9 +59,10 @@ RUN --mount=type=cache,target=/root/.yarn \
 # Copy built application from build stage
 COPY --from=build /app/dist ./dist
 
-# Copy Prisma schema and initialize Prisma (only if not exists)
-COPY backend/prisma ./prisma
-RUN if [ ! -f "prisma/schema.prisma" ]; then npx prisma init; fi
+# Copy Prisma schema and generated client from build stage
+COPY --from=build /app/prisma ./prisma
+COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=build /app/generated ./generated
 
 # Set user ID
 USER 1000:1000
