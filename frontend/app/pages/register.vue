@@ -303,9 +303,33 @@ const handleRegister = async () => {
   } catch (error: any) {
     console.error('Lỗi đăng ký:', error)
     
-    // Show error toast with specific error message
-    const errorMessage = error.message || 'Có lỗi xảy ra, vui lòng thử lại!'
-    showToast('error', errorMessage)
+    // Handle API validation errors
+    if (error.data && error.data.errors && Array.isArray(error.data.errors)) {
+      // Clear previous errors
+      Object.keys(errors).forEach(key => {
+        errors[key as keyof FormErrors] = ''
+      })
+      
+      // Map API errors to form fields
+      error.data.errors.forEach((apiError: string) => {
+        if (apiError.includes('email')) {
+          errors.email = apiError
+        } else if (apiError.includes('phone')) {
+          errors.phone = apiError
+        } else if (apiError.includes('password')) {
+          errors.password = apiError
+        } else if (apiError.includes('fullName') || apiError.includes('name')) {
+          errors.fullName = apiError
+        }
+      })
+      
+      // Show general error message
+      showToast('error', error.data.message || 'Vui lòng kiểm tra lại thông tin!')
+    } else {
+      // Show general error message
+      const errorMessage = error.message || 'Có lỗi xảy ra, vui lòng thử lại!'
+      showToast('error', errorMessage)
+    }
     
   } finally {
     loading.value = false

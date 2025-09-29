@@ -47,7 +47,11 @@ export const useAuth = () => {
       
       return response
     } catch (error: any) {
-      throw new Error(error.data?.message || 'Đăng ký thất bại')
+      // Preserve full error object for detailed handling
+      const enhancedError = new Error(error.data?.message || 'Đăng ký thất bại')
+      enhancedError.data = error.data
+      enhancedError.status = error.status
+      throw enhancedError
     }
   }
 
