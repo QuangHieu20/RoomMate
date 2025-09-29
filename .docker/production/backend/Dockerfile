@@ -42,8 +42,9 @@ WORKDIR /app
 COPY backend/package.json ./
 COPY backend/yarn.lock ./
 
-# Install only production dependencies
+# Install global dependencies and production dependencies
 RUN --mount=type=cache,target=/root/.yarn \
+    yarn global add @nestjs/cli prisma && \
     yarn install --frozen-lockfile --production --network-timeout 1000000 && \
     yarn cache clean && \
     # Remove unnecessary files
@@ -51,6 +52,10 @@ RUN --mount=type=cache,target=/root/.yarn \
 
 # Copy built application from build stage
 COPY --from=build /app/dist ./dist
+
+# Copy Prisma schema and initialize Prisma (only if not exists)
+COPY backend/prisma ./prisma
+RUN if [ ! -f "prisma/schema.prisma" ]; then npx prisma init; fi
 
 # Set user ID
 USER 1000:1000
