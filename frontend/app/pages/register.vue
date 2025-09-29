@@ -32,7 +32,7 @@
           v-model="form.email"
           type="email"
           required
-          class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-4 py-2 text-black border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           :class="{ 'border-red-500': errors.email }"
           placeholder="Email*"
         />
@@ -41,7 +41,7 @@
 
       <!-- Phone Field -->
       <div class="form-group">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+        <label class="block text-sm text-black  font-medium text-gray-700 mb-1">Số điện thoại</label>
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <span class="text-gray-500 text-sm">🇻🇳 +84</span>
@@ -49,7 +49,8 @@
           <input
             v-model="form.phone"
             type="tel"
-            class="w-full pl-16 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+            class="w-full pl-16 pr-4 py-3 text-black  border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             :class="{ 'border-red-500': errors.phone }"
             placeholder="Số điện thoại"
           />
@@ -64,7 +65,7 @@
           v-model="form.fullName"
           type="text"
           required
-          class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-4 py-2 text-black  border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           :class="{ 'border-red-500': errors.fullName }"
           placeholder="Họ và tên*"
         />
@@ -79,7 +80,7 @@
             v-model="form.password"
             :type="showPassword ? 'text' : 'password'"
             required
-            class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-4 py-3 pr-12 text-black border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             :class="{ 'border-red-500': errors.password }"
             placeholder="Mật khẩu"
           />
