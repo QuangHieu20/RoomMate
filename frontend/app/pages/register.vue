@@ -61,14 +61,14 @@
       <div class="form-group">
         <label class="block text-sm font-medium text-gray-700 mb-1">Họ và tên*</label>
         <input
-          v-model="form.name"
+          v-model="form.fullName"
           type="text"
           required
           class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          :class="{ 'border-red-500': errors.name }"
+          :class="{ 'border-red-500': errors.fullName }"
           placeholder="Họ và tên*"
         />
-        <p v-if="errors.name" class="text-red-500 text-sm mt-1">{{ errors.name }}</p>
+        <p v-if="errors.fullName" class="text-red-500 text-sm mt-1">{{ errors.fullName }}</p>
       </div>
 
       <!-- Password Field -->
@@ -144,41 +144,93 @@
         <span>Tiếp tục với Google</span>
       </button>
     </form>
+    
+    <!-- Toast Notifications -->
+    <ClientOnly>
+      <div v-if="toast.show" class="fixed top-4 right-4 z-50">
+        <div 
+          class="px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2"
+          :class="{
+            'bg-green-500 text-white': toast.type === 'success',
+            'bg-red-500 text-white': toast.type === 'error',
+            'bg-yellow-500 text-white': toast.type === 'warning',
+            'bg-blue-500 text-white': toast.type === 'info'
+          }"
+        >
+          <svg v-if="toast.type === 'success'" xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <svg v-else-if="toast.type === 'error'" xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <svg v-else-if="toast.type === 'warning'" xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{{ toast.message }}</span>
+        </div>
+      </div>
+    </ClientOnly>
   </div>
 </template>
 
 <script setup lang="ts">
+import type { RegisterDto, FormErrors, ToastMessage } from '~/types/auth'
+
 definePageMeta({
   layout: 'auth'
 })
-const form = reactive({
-  name: '',
+
+// Composable
+const { register, saveToken } = useAuth()
+const router = useRouter()
+
+// Form data
+const form = reactive<RegisterDto>({
   email: '',
   phone: '',
-  password: ''
+  fullName: '',
+  password: '',
+  avatar: ''
 })
 
+// UI state
 const loading = ref(false)
 const showPassword = ref(false)
-const errors = reactive({
-  name: '',
-  email: '',
-  phone: '',
-  password: ''
+
+// Toast state
+const toast = reactive<ToastMessage & { show: boolean }>({
+  show: false,
+  type: 'info',
+  message: '',
+  duration: 3000
 })
 
-const validateForm = () => {
+// Form errors
+const errors = reactive<FormErrors>({
+  email: '',
+  password: '',
+  phone: '',
+  fullName: ''
+})
+
+// Validation function
+const validateForm = (): boolean => {
   // Reset errors
-  Object.keys(errors).forEach(key => errors[key] = '')
+  Object.keys(errors).forEach(key => {
+    errors[key as keyof FormErrors] = ''
+  })
   
   let isValid = true
   
-  // Name validation
-  if (!form.name.trim()) {
-    errors.name = 'Vui lòng nhập họ và tên'
+  // Full name validation
+  if (!form.fullName.trim()) {
+    errors.fullName = 'Vui lòng nhập họ và tên'
     isValid = false
-  } else if (form.name.trim().length < 2) {
-    errors.name = 'Họ và tên phải có ít nhất 2 ký tự'
+  } else if (form.fullName.trim().length < 2) {
+    errors.fullName = 'Họ và tên phải có ít nhất 2 ký tự'
     isValid = false
   }
   
@@ -192,8 +244,11 @@ const validateForm = () => {
     isValid = false
   }
   
-  // Phone validation (optional)
-  if (form.phone && !/^[0-9+\-\s()]+$/.test(form.phone)) {
+  // Phone validation
+  if (!form.phone.trim()) {
+    errors.phone = 'Vui lòng nhập số điện thoại'
+    isValid = false
+  } else if (!/^[0-9+\-\s()]+$/.test(form.phone)) {
     errors.phone = 'Số điện thoại không hợp lệ'
     isValid = false
   }
@@ -210,6 +265,19 @@ const validateForm = () => {
   return isValid
 }
 
+// Show toast function
+const showToast = (type: ToastMessage['type'], message: string, duration = 3000) => {
+  toast.type = type
+  toast.message = message
+  toast.duration = duration
+  toast.show = true
+  
+  setTimeout(() => {
+    toast.show = false
+  }, duration)
+}
+
+// Handle register
 const handleRegister = async () => {
   if (!validateForm()) {
     return
@@ -219,46 +287,25 @@ const handleRegister = async () => {
   
   try {
     console.log('Đăng ký:', form)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
     
-    // Show success toast (you can replace this with a proper toast component)
-    const toast = document.createElement('div')
-    toast.className = 'toast toast-top toast-end'
-    toast.innerHTML = `
-      <div class="alert alert-success">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>Đăng ký thành công!</span>
-      </div>
-    `
-    document.body.appendChild(toast)
+      // Call API (token automatically saved to HttpOnly cookie by backend)
+      const response = await register(form)
     
-    // Remove toast after 3 seconds
+    // Show success toast
+    showToast('success', 'Đăng ký thành công!')
+    
+    // Redirect to home page
     setTimeout(() => {
-      document.body.removeChild(toast)
-    }, 3000)
+      router.push('/')
+    }, 1000)
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Lỗi đăng ký:', error)
     
-    // Show error toast
-    const toast = document.createElement('div')
-    toast.className = 'toast toast-top toast-end'
-    toast.innerHTML = `
-      <div class="alert alert-error">
-        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span>Có lỗi xảy ra, vui lòng thử lại!</span>
-      </div>
-    `
-    document.body.appendChild(toast)
+    // Show error toast with specific error message
+    const errorMessage = error.message || 'Có lỗi xảy ra, vui lòng thử lại!'
+    showToast('error', errorMessage)
     
-    setTimeout(() => {
-      document.body.removeChild(toast)
-    }, 3000)
   } finally {
     loading.value = false
   }

@@ -18,12 +18,12 @@
         </h2>
         <p class="text-gray-600 text-sm leading-relaxed">
           Gia nhập cộng đồng <span class="text-blue-600 font-medium">RoomMate</span> của chúng tôi hôm nay<br>
-          Tạo tài khoản để mở ra cơ hội và trải nghiệm mới.
+          Đăng nhập để tiếp tục trải nghiệm.
         </p>
       </div>
   
       <!-- Form -->
-      <form @submit.prevent="handleRegister" class="space-y-6 max-w-[80%] mx-auto">
+      <form @submit.prevent="handleLogin" class="space-y-6 max-w-[80%] mx-auto">
         <!-- Email Field -->
         <div class="form-group">
           <label class="block text-sm font-medium text-gray-700 mb-1">Email*</label>
@@ -31,9 +31,9 @@
             v-model="form.email"
             type="email"
             required
-            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
             :class="{ 'border-red-500': errors.email }"
-            placeholder="Email*"
+            placeholder="Nhập địa chỉ email"
           />
           <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
         </div>
@@ -46,9 +46,9 @@
               v-model="form.password"
               :type="showPassword ? 'text' : 'password'"
               required
-              class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
               :class="{ 'border-red-500': errors.password }"
-              placeholder="Mật khẩu"
+              placeholder="Nhập mật khẩu"
             />
             <button
               type="button"
@@ -74,15 +74,15 @@
           class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 disabled:opacity-50"
           :class="{ 'opacity-50 cursor-not-allowed': loading }"
         >
-          {{ loading ? 'Đang tạo tài khoản...' : 'Tiếp tục' }}
+          {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
         </button>
   
-        <!-- Login Link -->
+        <!-- Register Link -->
         <div class="text-center">
           <p class="text-sm text-gray-600">
-            Đã có tài khoản? 
-            <NuxtLink to="/login" class="text-blue-600 hover:text-blue-700 font-medium">
-              Đăng nhập
+            Chưa có tài khoản? 
+            <NuxtLink to="/register" class="text-blue-600 hover:text-blue-700 font-medium">
+              Đăng ký ngay
             </NuxtLink>
           </p>
         </div>
@@ -114,21 +114,29 @@
       
       <!-- Toast Notifications -->
       <ClientOnly>
-        <div v-if="showSuccessToast" class="fixed top-4 right-4 z-50">
-          <div class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+        <div v-if="toast.show" class="fixed top-4 right-4 z-50">
+          <div 
+            class="px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2"
+            :class="{
+              'bg-green-500 text-white': toast.type === 'success',
+              'bg-red-500 text-white': toast.type === 'error',
+              'bg-yellow-500 text-white': toast.type === 'warning',
+              'bg-blue-500 text-white': toast.type === 'info'
+            }"
+          >
+            <svg v-if="toast.type === 'success'" xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>{{ toastMessage }}</span>
-          </div>
-        </div>
-        
-        <div v-if="showErrorToast" class="fixed top-4 right-4 z-50">
-          <div class="bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <svg v-else-if="toast.type === 'error'" xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>{{ toastMessage }}</span>
+            <svg v-else-if="toast.type === 'warning'" xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ toast.message }}</span>
           </div>
         </div>
       </ClientOnly>
@@ -136,42 +144,48 @@
   </template>
   
   <script setup lang="ts">
+  import type { LoginDto, FormErrors, ToastMessage } from '~/types/auth'
+
   definePageMeta({
     layout: 'auth'
   })
-  const form = reactive({
-    name: '',
+
+  // Composable
+  const { login, saveToken } = useAuth()
+  const router = useRouter()
+
+  // Form data
+  const form = reactive<LoginDto>({
     email: '',
-    phone: '',
     password: ''
   })
   
+  // UI state
   const loading = ref(false)
   const showPassword = ref(false)
-  const showSuccessToast = ref(false)
-  const showErrorToast = ref(false)
-  const toastMessage = ref('')
-  const errors = reactive({
-    name: '',
+  
+  // Toast state
+  const toast = reactive<ToastMessage & { show: boolean }>({
+    show: false,
+    type: 'info',
+    message: '',
+    duration: 3000
+  })
+  
+  // Form errors
+  const errors = reactive<FormErrors>({
     email: '',
-    phone: '',
     password: ''
   })
   
-  const validateForm = () => {
+  // Validation function
+  const validateForm = (): boolean => {
     // Reset errors
-    Object.keys(errors).forEach(key => errors[key] = '')
+    Object.keys(errors).forEach(key => {
+      errors[key as keyof FormErrors] = ''
+    })
     
     let isValid = true
-    
-    // Name validation
-    if (!form.name.trim()) {
-      errors.name = 'Vui lòng nhập họ và tên'
-      isValid = false
-    } else if (form.name.trim().length < 2) {
-      errors.name = 'Họ và tên phải có ít nhất 2 ký tự'
-      isValid = false
-    }
     
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -180,12 +194,6 @@
       isValid = false
     } else if (!emailRegex.test(form.email)) {
       errors.email = 'Địa chỉ email không hợp lệ'
-      isValid = false
-    }
-    
-    // Phone validation (optional)
-    if (form.phone && !/^[0-9+\-\s()]+$/.test(form.phone)) {
-      errors.phone = 'Số điện thoại không hợp lệ'
       isValid = false
     }
     
@@ -200,40 +208,44 @@
     
     return isValid
   }
+
+  // Show toast function
+  const showToast = (type: ToastMessage['type'], message: string, duration = 3000) => {
+    toast.type = type
+    toast.message = message
+    toast.duration = duration
+    toast.show = true
+    
+    setTimeout(() => {
+      toast.show = false
+    }, duration)
+  }
   
-  const handleRegister = async () => {
+  // Handle login
+  const handleLogin = async () => {
     if (!validateForm()) {
       return
     }
     
     loading.value = true
-    
-    try {
-      console.log('Đăng ký:', form)
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
+
       
-      // Show success toast
-      showSuccessToast.value = true
-      toastMessage.value = 'Đăng ký thành công!'
+      // Call API (token automatically saved to HttpOnly cookie by backend)
+     await login(form).then((response) => {
+      if(response.data.access_token) {
+         // Show success toast
+      showToast('success', 'Đăng nhập thành công!')
+        router.push('/')
+      }
+     }).catch((error) => {
+      console.error('Lỗi đăng nhập:', error)
       
-      // Hide toast after 3 seconds
-      setTimeout(() => {
-        showSuccessToast.value = false
-      }, 3000)
-      
-    } catch (error) {
-      console.error('Lỗi đăng ký:', error)
-      
-      // Show error toast
-      showErrorToast.value = true
-      toastMessage.value = 'Có lỗi xảy ra, vui lòng thử lại!'
-      
-      setTimeout(() => {
-        showErrorToast.value = false
-      }, 3000)
-    } finally {
+      // Show error toast with specific error message
+      const errorMessage = error.message || 'Có lỗi xảy ra, vui lòng thử lại!'
+      showToast('error', errorMessage)
+     }).finally(() => {
       loading.value = false
-    }
+     })
+
   }
   </script>

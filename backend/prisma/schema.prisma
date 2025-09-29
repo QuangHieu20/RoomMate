@@ -1,0 +1,213 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  moderator
+  super_admin
+  user
+}
+
+enum UserStatus {
+  active
+  inactive
+  banned
+}
+
+enum PostType {
+  for_rent
+  looking_for
+}
+
+enum PostStatus {
+  draft
+  pending
+  approved
+  rejected
+  expired
+  rented
+}
+
+enum PriceType {
+  monthly
+  daily
+}
+
+enum RoomType {
+  single_room
+  shared_room
+  apartment
+  house
+  studio
+}
+
+enum GenderRequirement {
+  male
+  female
+  any
+}
+
+enum MessageType {
+  text
+  image
+  location
+  contact
+}
+
+model User {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  fullName         String?   @db.VarChar
+  email            String    @unique @db.VarChar
+  phone            String    @unique @db.VarChar
+  passwordHash     String   @map("password_hash") @db.VarChar
+  role             UserRole?
+  status           UserStatus @default(inactive)
+  avatar           String?   @db.VarChar
+  emailVerifiedAt  DateTime? @map("email_verified_at") @db.Timestamp(6)
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  // Relations
+  posts            Post[]    @relation("UserPosts")
+  approvedPosts    Post[]    @relation("ApprovedByUser")
+  postViews        PostView[]
+  sentMessages     Message[] @relation("SenderMessages")
+  conversations1   Conversation[] @relation("Participant1")
+  conversations2   Conversation[] @relation("Participant2")
+
+  @@index([email])
+  @@index([phone])
+  @@index([role, status])
+  @@map("users")
+}
+
+model Post {
+  id                  String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId              String            @map("user_id") @db.Uuid
+  type                PostType
+  title               String            @db.VarChar(500)
+  description         String?           @db.Text
+  price               Int?              // Giá VND
+  priceType           PriceType         @default(monthly) @map("price_type")
+  area                Int?              // Diện tích m2
+  address             String?           @db.VarChar(500)
+  locationId          Int?              @map("location_id") // Quận/Huyện/Phường trong Hà Nội
+  latitude            Decimal?          @db.Decimal(10, 8) // Tọa độ Hà Nội
+  longitude           Decimal?          @db.Decimal(11, 8) // Tọa độ Hà Nội
+  roomType            RoomType?         @map("room_type") // Loại phòng: đơn đôi, hộ gia đình
+  genderRequirement   GenderRequirement @default(any) @map("gender_requirement")
+  maxOccupants        Int               @default(1) @map("max_occupants") // Số lượng người ở tối đa
+  availableFrom       DateTime?         @map("available_from") @db.Date // Thời gian có thể vào ở
+  contactName         String?           @map("contact_name") @db.VarChar(255)
+  contactPhone        String?           @map("contact_phone") @db.VarChar(15)
+  status              PostStatus        @default(draft) // Trạng thái bài viết
+  approvedBy          String?           @map("approved_by") @db.Uuid // Người duyệt bài
+  approvedAt          DateTime?         @map("approved_at") @db.Timestamp(6) // Tgian duyệt bài
+  rejectionReason     String?           @map("rejection_reason") @db.Text // Quy định phòng
+  viewsCount          Int               @default(0) @map("views_count")
+  favoritesCount      Int               @default(0) @map("favorites_count")
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime          @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  expiresAt           DateTime?         @map("expires_at") @db.Timestamp(6) // Hạn hết bài
+
+  // Relations
+  user                User              @relation("UserPosts", fields: [userId], references: [id])
+  approver            User?             @relation("ApprovedByUser", fields: [approvedBy], references: [id])
+  images              PostImage[]
+  views               PostView[]
+  conversations       Conversation[]
+
+  @@index([userId])
+  @@index([type, status])
+  @@index([locationId, status])
+  @@index([price])
+  @@index([latitude, longitude])
+  @@index([createdAt(sort: Desc)], map: "idx_posts_created_desc")
+  @@map("posts")
+}
+
+model PostImage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId    String   @map("post_id") @db.Uuid
+  imageUrl  String   @map("image_url") @db.VarChar(500)
+  altText   String?  @map("alt_text") @db.VarChar(255)
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  // Relations
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId, sortOrder])
+  @@map("post_images")
+}
+
+model PostView {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId    String    @map("post_id") @db.Uuid
+  viewerIp  String?   @map("viewer_ip") @db.Inet
+  viewerId  String?   @map("viewer_id") @db.Uuid
+  viewedAt  DateTime  @default(now()) @map("viewed_at") @db.Timestamp(6)
+
+  // Relations
+  post      Post      @relation(fields: [postId], references: [id])
+  viewer    User?     @relation(fields: [viewerId], references: [id])
+
+  @@index([postId, viewedAt])
+  @@index([postId])
+  @@map("post_views")
+}
+
+model Conversation {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  postId          String?   @map("post_id") @db.Uuid
+  participant1    String    @map("participant_1") @db.Uuid
+  participant2    String    @map("participant_2") @db.Uuid
+  lastMessageId   String?   @map("last_message_id") @db.Uuid
+  lastMessageAt   DateTime? @map("last_message_at") @db.Timestamp(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+
+  // Relations
+  post            Post?     @relation(fields: [postId], references: [id])
+  user1           User      @relation("Participant1", fields: [participant1], references: [id])
+  user2           User      @relation("Participant2", fields: [participant2], references: [id])
+  lastMessage     Message?  @relation("LastMessage", fields: [lastMessageId], references: [id])
+  messages        Message[] @relation("ConversationMessages")
+
+  @@unique([participant1, participant2, postId])
+  @@index([participant1, lastMessageAt])
+  @@index([participant2, lastMessageAt])
+  @@map("conversations")
+}
+
+model Message {
+  id               String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  conversationId   String       @map("conversation_id") @db.Uuid
+  senderId         String       @map("sender_id") @db.Uuid
+  messageType      MessageType  @default(text) @map("message_type")
+  content          String?      @db.Text
+  metadata         Json?
+  isRead           Boolean      @default(false) @map("is_read")
+  createdAt        DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+
+  // Relations
+  conversation     Conversation @relation("ConversationMessages", fields: [conversationId], references: [id], onDelete: Cascade)
+  sender           User         @relation("SenderMessages", fields: [senderId], references: [id])
+  lastMessageOf    Conversation[] @relation("LastMessage")
+
+  @@index([conversationId, createdAt])
+  @@index([senderId, createdAt])
+  @@index([conversationId, isRead])
+  @@map("messages")
+}

@@ -9,6 +9,12 @@ export default defineNuxtConfig({
 
     ssr: true,
 
+    runtimeConfig: {
+        public: {
+            apiBase: process.env.NUXT_PUBLIC_API_BASE || 'https://roommate.id.vn'
+        }
+    },
+
     app: {
         head: {
             link: [
