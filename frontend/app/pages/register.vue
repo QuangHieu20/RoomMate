@@ -29,7 +29,7 @@
 
     <!-- Form -->
     <VeeForm 
-      @submit.prevent="handleRegister" 
+      @submit="handleRegister" 
       :validation-schema="validationSchema"
       class="space-y-6 max-w-[80%] mx-auto"
     >
@@ -213,7 +213,7 @@ definePageMeta({
   layout: 'auth'
 })
 // Composable
-const { register, saveToken } = useAuth()
+const { register } = useAuth()
 const router = useRouter()
 
 // Validation schema với i18n (useI18n() được gọi bên trong)
@@ -251,25 +251,21 @@ const showToast = (type: ToastMessage['type'], message: string, duration = 3000)
 }
 
 // Handle register
-const handleRegister = async (values: any, { setFieldError, errors, isSubmitting }: any) => {
+const handleRegister = async (values: RegisterDto| unknown) => {
   try {
     loading.value = true
     
     // Call API (token automatically saved to HttpOnly cookie by backend)
     const response = await register(values as RegisterDto)
-  
-    // Show success toast
-    showToast('success', t('auth.messages.registerSuccess'))
-    
-    // Redirect to home page
-    setTimeout(() => {
-      router.push('/')
-    }, 1000)
-    
+    if (response.data.access_token) {
+        // Show success toast
+        showToast('success', t('auth.messages.registerSuccess'))
+        await router.push('/')
+      }    
   } catch (error: any) {
     console.error('Lỗi đăng ký:', error)
     
-    // Show general error message
+    // Show error toast with specific error message
     const errorMessage = error.message || t('auth.messages.registerError')
     showToast('error', errorMessage)
     

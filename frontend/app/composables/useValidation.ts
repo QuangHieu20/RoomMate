@@ -1,7 +1,7 @@
 import * as yup from 'yup'
 
 export const useValidationSchema = () => {
-  const { t, locale } = useI18n()
+  const { t } = useI18n()
 
   // Tạo computed schemas để reactive với locale changes
   const registerSchema = computed(() => yup.object({
@@ -13,7 +13,7 @@ export const useValidationSchema = () => {
       .string()
       .required(t('auth.validation.phoneRequired'))
       .matches(/^[0-9]+$/, t('auth.validation.phoneInvalid'))
-      .min(10, t('auth.validation.phoneMin'))
+      .min(8, t('auth.validation.phoneMin'))
       .max(15, t('auth.validation.phoneMax')),
     fullName: yup
       .string()
@@ -39,7 +39,7 @@ export const useValidationSchema = () => {
     password: yup
       .string()
       .required(t('auth.validation.passwordRequired'))
-      .min(6, t('auth.validation.passwordMin'))
+      .min(8, t('auth.validation.passwordMin'))
   }))
 
   return {

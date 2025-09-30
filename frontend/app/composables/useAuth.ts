@@ -5,7 +5,7 @@ export const useAuth = () => {
   const baseURL = config.public.apiBase || 'https://roommate.id.vn'
   // Check if user is authenticated
   const isAuthenticated = useState<boolean>('auth-isAuthenticated', () => false)
-  const currentUser = useState('auth-currentUser', () => null)
+  const currentUser = useState<LoginResponseDto['data']['user'] | null>('auth-currentUser', () => null)
   // Login function
   const login = async (credentials: LoginDto): Promise<LoginResponseDto> => {
     try {
@@ -48,8 +48,8 @@ export const useAuth = () => {
     } catch (error: any) {
       // Preserve full error object for detailed handling
       const enhancedError = new Error(error.data?.message || 'Đăng ký thất bại')
-      enhancedError.data = error.data
-      enhancedError.status = error.status
+      ;(enhancedError as any).data = error.data
+      ;(enhancedError as any).status = error.status
       throw enhancedError
     }
   }

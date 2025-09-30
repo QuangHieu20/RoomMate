@@ -28,7 +28,7 @@
   
       <!-- Form -->
       <VeeForm 
-        @submit.prevent="handleLogin" 
+        @submit="handleLogin"
         :validation-schema="validationSchema"
         class="space-y-6 max-w-[80%] mx-auto"
       >
@@ -173,7 +173,6 @@ import { toTypedSchema } from '@vee-validate/yup'
   const { login } = useAuth()
   const router = useRouter()
   
-  // Validation schema với i18n (useI18n() được gọi bên trong)
   const { loginSchema } = useValidationSchema()
   const validationSchema = computed(() => toTypedSchema(loginSchema.value))
   
@@ -206,17 +205,17 @@ import { toTypedSchema } from '@vee-validate/yup'
   }
   
   // Handle login
-  const handleLogin = async (values: any, { setFieldError, errors, isSubmitting }: any) => {
+  const handleLogin = async (values: LoginDto | unknown) => {
     try {
       loading.value = true
 
       // Call API (token automatically saved to HttpOnly cookie by backend)
       const response = await login(values as LoginDto)
       
-      if (response.access_token) {
+      if (response.data.access_token) {
         // Show success toast
         showToast('success', t('auth.messages.loginSuccess'))
-        router.push('/')
+        await router.push('/')
       }
     } catch (error: any) {
       console.error('Lỗi đăng nhập:', error)

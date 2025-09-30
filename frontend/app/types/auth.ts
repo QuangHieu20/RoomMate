@@ -15,7 +15,19 @@ export interface RegisterDto {
 
 // Login Response DTO
 export interface LoginResponseDto {
-  access_token: string
+  success: boolean
+  message: string
+  data: {
+    access_token: string
+    user: {
+      id: string
+      email: string
+      name: string
+      avatar: string | null
+    }
+  }
+  timestamp: string
+  path: string
 }
 
 // User interface

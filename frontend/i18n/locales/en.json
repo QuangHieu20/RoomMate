@@ -58,7 +58,7 @@
       "nameMin": "Full name must be at least 2 characters",
       "nameMax": "Full name must not exceed 50 characters",
       "nameAlpha": "Full name must contain only letters",
-      "passwordMin": "Password must be at least 6 characters",
+      "passwordMin": "Password must be at least 8 characters",
       "passwordMax": "Password must not exceed 50 characters",
       "emailRequired": "Please enter email address",
       "emailInvalid": "Invalid email address",
