@@ -74,8 +74,9 @@ jobs:
         PORT=3000
         
         # Frontend Configuration
-        NUXT_PUBLIC_BASE_URL=https://roommate.id.vn
-        NUXT_PUBLIC_API_BASE_URL=https://roommate.id.vn/api
+        NUXT_PUBLIC_API_BASE=${{ secrets.NUXT_PUBLIC_API_BASE }}
+        NUXT_PUBLIC_FRONTEND_URL=${{ secrets.NUXT_PUBLIC_FRONTEND_URL }}
+        NUXT_PUBLIC_APP_NAME=${{ secrets.NUXT_PUBLIC_APP_NAME }}
         EOF
 
     - name: 🚀 Deploy to Production

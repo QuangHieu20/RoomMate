@@ -25,8 +25,8 @@ COPY frontend/ ./
 
 # Set build environment variables
 ENV NODE_ENV=production
-ENV NUXT_PUBLIC_BASE_URL=https://roommate.id.vn
-ENV NUXT_PUBLIC_API_BASE_URL=https://roommate.id.vn/api
+ARG NUXT_PUBLIC_API_BASE
+ENV NUXT_PUBLIC_API_BASE=${NUXT_PUBLIC_API_BASE}
 
 # Build the application as static site
 RUN yarn generate && \
