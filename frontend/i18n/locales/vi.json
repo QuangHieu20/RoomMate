@@ -1,0 +1,94 @@
+{
+  "common": {
+    "loading": "Đang tải...",
+    "error": "Có lỗi xảy ra",
+    "success": "Thành công",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "save": "Lưu",
+    "edit": "Sửa",
+    "delete": "Xóa",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "submit": "Gửi",
+    "close": "Đóng"
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng Nhập",
+      "subtitle": "Gia nhập cộng đồng {brand} của chúng tôi hôm nay",
+      "subtitle2": "Đăng nhập để tiếp tục trải nghiệm.",
+      "email": "Email",
+      "password": "Mật khẩu",
+      "emailPlaceholder": "Nhập địa chỉ email",
+      "passwordPlaceholder": "Nhập mật khẩu",
+      "loginButton": "Đăng nhập",
+      "loginButtonLoading": "Đang đăng nhập...",
+      "noAccount": "Chưa có tài khoản?",
+      "registerLink": "Đăng ký ngay",
+      "orUse": "Hoặc sử dụng",
+      "googleButton": "Tiếp tục với Google"
+    },
+    "register": {
+      "title": "Đăng ký miễn phí",
+      "subtitle": "Gia nhập cộng đồng {brand} của chúng tôi hôm nay",
+      "subtitle2": "Tạo tài khoản để mở ra cơ hội và trải nghiệm mới.",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "fullName": "Họ và tên",
+      "password": "Mật khẩu",
+      "emailPlaceholder": "Email",
+      "phonePlaceholder": "Số điện thoại",
+      "namePlaceholder": "Họ và tên",
+      "passwordPlaceholder": "Mật khẩu",
+      "registerButton": "Tiếp tục",
+      "registerButtonLoading": "Đang tạo tài khoản...",
+      "hasAccount": "Đã có tài khoản?",
+      "loginLink": "Đăng nhập",
+      "orUse": "Hoặc sử dụng",
+      "googleButton": "Tiếp tục với Google"
+    },
+    "validation": {
+      "required": "Trường này là bắt buộc",
+      "email": "Email không hợp lệ",
+      "phone": "Số điện thoại không hợp lệ",
+      "phoneMin": "Số điện thoại phải có ít nhất 10 ký tự",
+      "phoneMax": "Số điện thoại không được vượt quá 15 ký tự",
+      "nameMin": "Họ và tên phải có ít nhất 2 ký tự",
+      "nameMax": "Họ và tên không được vượt quá 50 ký tự",
+      "nameAlpha": "Họ và tên chỉ được chứa chữ cái",
+      "passwordMin": "Mật khẩu phải có ít nhất 6 ký tự",
+      "passwordMax": "Mật khẩu không được vượt quá 50 ký tự",
+      "emailRequired": "Vui lòng nhập địa chỉ email",
+      "emailInvalid": "Địa chỉ email không hợp lệ",
+      "phoneRequired": "Vui lòng nhập số điện thoại",
+      "phoneInvalid": "Số điện thoại không hợp lệ",
+      "nameRequired": "Vui lòng nhập họ và tên",
+      "passwordRequired": "Vui lòng nhập mật khẩu",
+      "bioMax": "Tiểu sử không được vượt quá 500 ký tự",
+      "confirmPasswordRequired": "Vui lòng xác nhận mật khẩu",
+      "passwordMismatch": "Mật khẩu xác nhận không khớp",
+      "subjectRequired": "Vui lòng nhập chủ đề",
+      "messageRequired": "Vui lòng nhập nội dung",
+      "messageMax": "Nội dung không được vượt quá 1000 ký tự"
+    },
+    "messages": {
+      "loginSuccess": "Đăng nhập thành công!",
+      "registerSuccess": "Đăng ký thành công!",
+      "loginError": "Có lỗi xảy ra, vui lòng thử lại!",
+      "registerError": "Có lỗi xảy ra, vui lòng thử lại!"
+    }
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất"
+  },
+  "brand": {
+    "name": "RoomMate"
+  }
+}

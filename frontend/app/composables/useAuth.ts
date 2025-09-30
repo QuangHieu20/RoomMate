@@ -21,7 +21,6 @@ export const useAuth = () => {
       // Set authenticated state after successful login
       isAuthenticated.value = true
       currentUser.value = response.data.user
-      console.log(isAuthenticated.value);
       
       
       return response
@@ -81,8 +80,8 @@ export const useAuth = () => {
   // Frontend doesn't need to manually save/get tokens
 
   const saveToken = async (token: string) => {
-    console.log('Token được tự động lưu vào HttpOnly cookie bởi backend')
-    console.log('Frontend không cần xử lý token thủ công')
+    // Token được tự động lưu vào HttpOnly cookie bởi backend
+    // Frontend không cần xử lý token thủ công
   }
 
   const getToken = async (): Promise<string | null> => {
@@ -126,7 +125,6 @@ export const useAuth = () => {
       const token = await getToken()
       isAuthenticated.value = !!token
     } catch (error) {
-      console.log('error', error)
       isAuthenticated.value = false
     }
     

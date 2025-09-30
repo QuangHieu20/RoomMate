@@ -1,72 +1,89 @@
 <template>
     <div class="w-full h-full bg-white p-8">
-      <!-- Logo -->
+      <!-- Header -->
       <div class="mb-8">
-        <div class="flex items-center space-x-3">
-          <img 
-            src="/assets/images/logo-in-page.svg" 
-            alt="RoomMate Logo" 
-            class="w-[208px] h-[48px] object-contain"
-          />
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <img 
+              src="/assets/images/logo-in-page.svg" 
+              alt="RoomMate Logo" 
+              class="w-[208px] h-[48px] object-contain"
+            />
+          </div>
+          <!-- Language Switcher -->
+          <LanguageSwitcher />
         </div>
       </div>
   
       <!-- Header -->
       <div class="mb-8 max-w-[80%] mx-auto">
         <h2 class="text-3xl font-bold text-gray-800 mb-4">
-          Đăng Nhập
+          {{ t('auth.login.title') }}
         </h2>
         <p class="text-gray-600 text-sm leading-relaxed">
-          Gia nhập cộng đồng <span class="text-blue-600 font-medium">RoomMate</span> của chúng tôi hôm nay<br>
-          Đăng nhập để tiếp tục trải nghiệm.
+          {{ t('auth.login.subtitle', { brand: t('brand.name') }) }}<br>
+          {{ t('auth.login.subtitle2') }}
         </p>
       </div>
   
       <!-- Form -->
-      <form @submit.prevent="handleLogin" class="space-y-6 max-w-[80%] mx-auto">
-        <!-- Email Field -->
+      <VeeForm 
+        @submit.prevent="handleLogin" 
+        :validation-schema="validationSchema"
+        class="space-y-6 max-w-[80%] mx-auto"
+      >
+        <!-- Email VeeField -->
         <div class="form-group">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Email*</label>
-          <input
-            v-model="form.email"
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ t('auth.login.email') }}*</label>
+          <VeeField
+            name="email"
             type="email"
-            required
-            class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
-            :class="{ 'border-red-500': errors.email }"
-            placeholder="Nhập địa chỉ email"
-          />
-          <p v-if="errors.email" class="text-red-500 text-sm mt-1">{{ errors.email }}</p>
+            v-slot="{ field, errorMessage }"
+          >
+            <input
+              v-bind="field"
+              type="email"
+              class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+              :class="{ 'border-red-500': errorMessage }"
+              :placeholder="t('auth.login.emailPlaceholder')"
+            />
+          </VeeField>
+          <VeeErrorMessage name="email" class="text-red-500 text-sm mt-1" />
         </div>
 
-        <!-- Password Field -->
+        <!-- Password VeeField -->
         <div class="form-group">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Mật khẩu</label>
-          <div class="relative">
-            <input
-              v-model="form.password"
-              :type="showPassword ? 'text' : 'password'"
-              required
-              class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
-              :class="{ 'border-red-500': errors.password }"
-              placeholder="Nhập mật khẩu"
-            />
-            <button
-              type="button"
-              @click="showPassword = !showPassword"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center"
-            >
-              <svg v-if="!showPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-              </svg>
-              <svg v-else class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
-              </svg>
-            </button>
-          </div>
-          <p v-if="errors.password" class="text-red-500 text-sm mt-1">{{ errors.password }}</p>
+          <label class="block text-sm font-medium text-gray-700 mb-2">{{ t('auth.login.password') }}*</label>
+          <VeeField
+            name="password"
+            v-slot="{ field, errorMessage }"
+          >
+            <div class="relative">
+              <input
+                v-bind="field"
+                :type="showPassword ? 'text' : 'password'"
+                class="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black"
+                :class="{ 'border-red-500': errorMessage }"
+                :placeholder="t('auth.login.passwordPlaceholder')"
+              />
+              <button
+                type="button"
+                @click="showPassword = !showPassword"
+                class="absolute inset-y-0 right-0 pr-3 flex items-center"
+              >
+                <svg v-if="!showPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                </svg>
+                <svg v-else class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                </svg>
+              </button>
+            </div>
+          </VeeField>
+          <VeeErrorMessage name="password" class="text-red-500 text-sm mt-1" />
         </div>
-  
+
         <!-- Submit Button -->
         <button
           type="submit"
@@ -74,15 +91,15 @@
           class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200 disabled:opacity-50"
           :class="{ 'opacity-50 cursor-not-allowed': loading }"
         >
-          {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+          {{ loading ? t('auth.login.loginButtonLoading') : t('auth.login.loginButton') }}
         </button>
   
         <!-- Register Link -->
         <div class="text-center">
           <p class="text-sm text-gray-600">
-            Chưa có tài khoản? 
+            {{ t('auth.login.noAccount') }} 
             <NuxtLink to="/register" class="text-blue-600 hover:text-blue-700 font-medium">
-              Đăng ký ngay
+              {{ t('auth.login.registerLink') }}
             </NuxtLink>
           </p>
         </div>
@@ -93,7 +110,7 @@
             <div class="w-full border-t border-gray-300"></div>
           </div>
           <div class="relative flex justify-center text-sm">
-            <span class="px-2 bg-white text-gray-500">Hoặc sử dụng</span>
+            <span class="px-2 bg-white text-gray-500">{{ t('auth.login.orUse') }}</span>
           </div>
         </div>
   
@@ -108,9 +125,10 @@
             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>
-          <span>Tiếp tục với Google</span>
+          <span>{{ t('auth.login.googleButton') }}</span>
         </button>
-      </form>
+      </VeeForm>
+    
       
       <!-- Toast Notifications -->
       <ClientOnly>
@@ -144,21 +162,23 @@
   </template>
   
   <script setup lang="ts">
-  import type { LoginDto, FormErrors, ToastMessage } from '~/types/auth'
+import type { LoginDto, ToastMessage } from '~/types/auth'
+import { useValidationSchema } from '~/composables/useValidation'
+import { toTypedSchema } from '@vee-validate/yup'
 
   definePageMeta({
     layout: 'auth'
   })
-
   // Composable
-  const { login, saveToken } = useAuth()
+  const { login } = useAuth()
   const router = useRouter()
-
-  // Form data
-  const form = reactive<LoginDto>({
-    email: '',
-    password: ''
-  })
+  
+  // Validation schema với i18n (useI18n() được gọi bên trong)
+  const { loginSchema } = useValidationSchema()
+  const validationSchema = computed(() => toTypedSchema(loginSchema.value))
+  
+  // i18n cho UI
+  const { t } = useI18n()
   
   // UI state
   const loading = ref(false)
@@ -172,42 +192,6 @@
     duration: 3000
   })
   
-  // Form errors
-  const errors = reactive<FormErrors>({
-    email: '',
-    password: ''
-  })
-  
-  // Validation function
-  const validateForm = (): boolean => {
-    // Reset errors
-    Object.keys(errors).forEach(key => {
-      errors[key as keyof FormErrors] = ''
-    })
-    
-    let isValid = true
-    
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!form.email.trim()) {
-      errors.email = 'Vui lòng nhập địa chỉ email'
-      isValid = false
-    } else if (!emailRegex.test(form.email)) {
-      errors.email = 'Địa chỉ email không hợp lệ'
-      isValid = false
-    }
-    
-    // Password validation
-    if (!form.password) {
-      errors.password = 'Vui lòng nhập mật khẩu'
-      isValid = false
-    } else if (form.password.length < 6) {
-      errors.password = 'Mật khẩu phải có ít nhất 6 ký tự'
-      isValid = false
-    }
-    
-    return isValid
-  }
 
   // Show toast function
   const showToast = (type: ToastMessage['type'], message: string, duration = 3000) => {
@@ -222,30 +206,26 @@
   }
   
   // Handle login
-  const handleLogin = async () => {
-    if (!validateForm()) {
-      return
-    }
-    
-    loading.value = true
+  const handleLogin = async (values: any, { setFieldError, errors, isSubmitting }: any) => {
+    try {
+      loading.value = true
 
-      
       // Call API (token automatically saved to HttpOnly cookie by backend)
-     await login(form).then((response) => {
-      if(response.data.access_token) {
-         // Show success toast
-      showToast('success', 'Đăng nhập thành công!')
+      const response = await login(values as LoginDto)
+      
+      if (response.access_token) {
+        // Show success toast
+        showToast('success', t('auth.messages.loginSuccess'))
         router.push('/')
       }
-     }).catch((error) => {
+    } catch (error: any) {
       console.error('Lỗi đăng nhập:', error)
       
       // Show error toast with specific error message
-      const errorMessage = error.message || 'Có lỗi xảy ra, vui lòng thử lại!'
+      const errorMessage = error.message || t('auth.messages.loginError')
       showToast('error', errorMessage)
-     }).finally(() => {
+    } finally {
       loading.value = false
-     })
-
+    }
   }
   </script>

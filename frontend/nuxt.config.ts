@@ -26,17 +26,51 @@ export default defineNuxtConfig({
         }
     },
 
-    modules: [
-        '@nuxtjs/tailwindcss'
-    ],
-    alias: {
-        '@': '<rootDir>',
-        '@assets': '<rootDir>/assets',
-        '@components': '<rootDir>/components',
-        '@modules': '<rootDir>/src/modules',
-        '@utils': '<rootDir>/utils',
-        '@public': '<rootDir>/public'
+    modules: ['@nuxtjs/tailwindcss', '@nuxtjs/i18n', '@vee-validate/nuxt'],
+    
+    // Vee-validate configuration
+    veeValidate: {
+        autoImports: true,
+        componentNames: {
+            Form: 'VeeForm',
+            Field: 'VeeField',
+            FieldArray: 'VeeFieldArray',
+            ErrorMessage: 'VeeErrorMessage',
+        }
     },
+        i18n: {
+            defaultLocale: 'vi',
+            locales: [
+                {
+                    code: 'en',
+                    iso: 'en-US',
+                    file: 'en.json',
+                    name: 'English'
+                  },
+                  {
+                    code: 'vi',
+                    iso: 'vi-VN',
+                    file: 'vi.json',
+                    name: 'Tiếng Việt'
+                  }
+            ],
+            langDir: 'locales',
+            strategy: 'no_prefix',
+            detectBrowserLanguage: {
+                useCookie: true,
+                cookieKey: 'i18n_redirected',
+                redirectOn: 'root'
+            }
+        },
+        alias: {
+            '@': '<rootDir>',
+            '@assets': '<rootDir>/assets',
+            '@components': '<rootDir>/components',
+            '@modules': '<rootDir>/src/modules',
+            '@utils': '<rootDir>/utils',
+            '@public': '<rootDir>/public'
+        },
+    
     
     vite: {
         assetsInclude: ['**/*.png', '**/*.jpg', '**/*.jpeg', '**/*.gif', '**/*.svg'],

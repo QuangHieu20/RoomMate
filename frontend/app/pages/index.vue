@@ -68,19 +68,19 @@ const closePostModal = () => {
 
 // Handle post actions
 const handleLike = (postId) => {
-  console.log('Like post:', postId)
+  // TODO: Implement like functionality
 }
 
 const handleComment = (postId, comment) => {
-  console.log('Comment on post:', postId, comment)
+  // TODO: Implement comment functionality
 }
 
 const handleShare = (postId) => {
-  console.log('Share post:', postId)
+  // TODO: Implement share functionality
 }
 
 const handleContact = (postId) => {
-  console.log('Contact for post:', postId)
+  // TODO: Implement contact functionality
 }
 </script>
 

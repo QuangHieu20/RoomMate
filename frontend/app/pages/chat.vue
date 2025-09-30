@@ -8,7 +8,6 @@ const newMessage = ref('')
 const sendMessage = () => {
   if (newMessage.value.trim()) {
     // TODO: Implement send message logic
-    console.log('Sending message:', newMessage.value)
     newMessage.value = ''
   }
 }

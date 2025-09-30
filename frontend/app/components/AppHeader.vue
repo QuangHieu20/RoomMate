@@ -26,9 +26,7 @@ const handleLogout = async () => {
 
 // Toggle user dropdown
 const toggleUserDropdown = () => {
-  console.log('Toggle dropdown, current value:', showUserDropdown.value)
   showUserDropdown.value = !showUserDropdown.value
-  console.log('New value:', showUserDropdown.value)
 }
 
 // Close dropdown when clicking outside

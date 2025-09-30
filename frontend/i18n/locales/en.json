@@ -1,0 +1,94 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "edit": "Edit",
+    "delete": "Delete",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close"
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Join our {brand} community today",
+      "subtitle2": "Login to continue your experience.",
+      "email": "Email",
+      "password": "Password",
+      "emailPlaceholder": "Enter email address",
+      "passwordPlaceholder": "Enter password",
+      "loginButton": "Login",
+      "loginButtonLoading": "Logging in...",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Sign up now",
+      "orUse": "Or use",
+      "googleButton": "Continue with Google"
+    },
+    "register": {
+      "title": "Free Registration",
+      "subtitle": "Join our {brand} community today",
+      "subtitle2": "Create an account to open up new opportunities and experiences.",
+      "email": "Email",
+      "phone": "Phone Number",
+      "fullName": "Full Name",
+      "password": "Password",
+      "emailPlaceholder": "Email",
+      "phonePlaceholder": "Phone Number",
+      "namePlaceholder": "Full Name",
+      "passwordPlaceholder": "Password",
+      "registerButton": "Continue",
+      "registerButtonLoading": "Creating account...",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Login",
+      "orUse": "Or use",
+      "googleButton": "Continue with Google"
+    },
+    "validation": {
+      "required": "This field is required",
+      "email": "Invalid email address",
+      "phone": "Invalid phone number",
+      "phoneMin": "Phone number must be at least 10 characters",
+      "phoneMax": "Phone number must not exceed 15 characters",
+      "nameMin": "Full name must be at least 2 characters",
+      "nameMax": "Full name must not exceed 50 characters",
+      "nameAlpha": "Full name must contain only letters",
+      "passwordMin": "Password must be at least 6 characters",
+      "passwordMax": "Password must not exceed 50 characters",
+      "emailRequired": "Please enter email address",
+      "emailInvalid": "Invalid email address",
+      "phoneRequired": "Please enter phone number",
+      "phoneInvalid": "Invalid phone number",
+      "nameRequired": "Please enter full name",
+      "passwordRequired": "Please enter password",
+      "bioMax": "Bio must not exceed 500 characters",
+      "confirmPasswordRequired": "Please confirm password",
+      "passwordMismatch": "Password confirmation does not match",
+      "subjectRequired": "Please enter subject",
+      "messageRequired": "Please enter message",
+      "messageMax": "Message must not exceed 1000 characters"
+    },
+    "messages": {
+      "loginSuccess": "Login successful!",
+      "registerSuccess": "Registration successful!",
+      "loginError": "An error occurred, please try again!",
+      "registerError": "An error occurred, please try again!"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "brand": {
+    "name": "RoomMate"
+  }
+}
