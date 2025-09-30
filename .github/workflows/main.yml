@@ -58,7 +58,7 @@ jobs:
         # Backend Configuration
         NODE_ENV=production
         PORT=3000
-        DATABASE_HOST=postgres
+        DATABASE_HOST=roommate_postgres_prod
         DATABASE_PORT=5432
         DATABASE_NAME=${{ secrets.POSTGRES_DB }}
         DATABASE_USER=${{ secrets.POSTGRES_USER }}
