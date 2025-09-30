@@ -17,7 +17,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DATABASE_HOST=roommate_postgres_prod
+      - DATABASE_HOST=postgres
       - DATABASE_PORT=5432
       - DATABASE_NAME=${POSTGRES_DB}
       - DATABASE_USER=${POSTGRES_USER}
