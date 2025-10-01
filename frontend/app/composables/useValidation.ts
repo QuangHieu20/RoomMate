@@ -23,12 +23,20 @@ export const useValidationSchema = () => {
       .matches(
         /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂÂÊÔƯăâêôư\s]+$/,
         t('auth.validation.nameAlpha')
-      ),
+      )
+      .test('no-only-spaces', t('auth.validation.nameNoSpaces'), function(value) {
+        if (!value) return true // Let required handle empty values
+        return value.trim().length > 0
+      }),
     password: yup
       .string()
       .required(t('auth.validation.passwordRequired'))
       .min(6, t('auth.validation.passwordMin'))
       .max(50, t('auth.validation.passwordMax'))
+      .test('no-only-spaces', t('auth.validation.passwordNoSpaces'), function(value) {
+        if (!value) return true // Let required handle empty values
+        return value.trim().length > 0
+      }),
   }))
 
   const loginSchema = computed(() => yup.object({

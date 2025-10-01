@@ -66,7 +66,6 @@ export const useAuth = () => {
     } catch (error: any) {
       // Handle authentication errors
       if (error.status === 401) {
-        // Token expired or invalid, redirect to login
         await removeToken()
         await navigateTo('/login')
         throw new Error('Phiên đăng nhập đã hết hạn')
