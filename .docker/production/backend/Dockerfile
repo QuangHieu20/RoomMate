@@ -64,6 +64,11 @@ COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=build /app/generated ./generated
 
+# Tạo thư mục uploads với quyền phù hợp
+RUN mkdir -p /app/uploads/posts && \
+    chmod 755 /app/uploads/posts && \
+    chown -R 1000:1000 /app/uploads
+
 # Set user ID
 USER 1000:1000
 
