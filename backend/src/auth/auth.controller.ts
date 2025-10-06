@@ -1,8 +1,8 @@
-import { Body, Controller, Post, Get, Res, Req } from '@nestjs/common';
+import { Body, Controller, Post, Get, Res, Req, UnauthorizedException } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { AuthService } from '@/auth/auth.service';
 import { LoginDto } from '@/auth/dto/login.dto/login.dto';
-import { LoginResponseDto } from '@/auth/dto/login-response.dto/login-response.dto';
+import { AuthResponseDto } from '@/auth/dto/auth-response.dto/auth-response.dto';
 import { RegisterResponseDto } from '@/auth/dto/register-response.dto/register-response.dto';
 
 @Controller('auth')
@@ -13,41 +13,56 @@ export class AuthController {
   async login(
     @Body() dto: LoginDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<LoginResponseDto> {
-    const user = await this.authService.validateUser(dto.email, dto.password);
-    const userDto = this.authService.toUserDto(user);
-    const loginResponse = this.authService.login(userDto);
+  ): Promise<AuthResponseDto> {
+    const { user, accessToken, refreshToken } = await this.authService.login(
+      dto.email,
+      dto.password,
+    );
 
-    // Set HttpOnly cookie
-    res.cookie('access_token', loginResponse.access_token, {
+    // Set Access Token cookie (15 minutes)
+    res.cookie('access_token', accessToken, {
       httpOnly: true,
-      secure: false, // Set to false for development
-      sameSite: 'lax', // Back to 'lax' for same-origin
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 1000, // 15 minutes
       path: '/',
-      // Remove domain to let browser handle it
     });
 
-    return loginResponse;
+    // Set Refresh Token cookie (7 days)
+    res.cookie('refresh_token', refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/',
+    });
+
+    // Return only user data
+    return {
+      user,
+    };
   }
 
   @Post('register')
   async register(
     @Body() dto: RegisterResponseDto,
     @Res({ passthrough: true }) res: Response,
-  ): Promise<LoginResponseDto> {
-    const registerResponse = await this.authService.register(dto);
+  ): Promise<AuthResponseDto> {
+    const { user } = await this.authService.register(dto);
 
     // Set HttpOnly cookie
-    res.cookie('access_token', registerResponse.access_token, {
+    res.cookie('access_token', {
       httpOnly: true,
       secure: false, // Set to false for development
       sameSite: 'lax', // Change from 'strict' to 'lax' for development
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
       path: '/',
     });
 
-    return registerResponse;
+    // Return only user data, no token in response
+    return {
+      user: user,
+    };
   }
 
   // New endpoints for HttpOnly cookie management
@@ -60,7 +75,7 @@ export class AuthController {
       httpOnly: true,
       secure: false, // Set to false for development
       sameSite: 'lax', // Change from 'strict' to 'lax' for development
-      maxAge: 15 * 60 * 1000, // 15 minutes
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
       path: '/',
     });
 
@@ -69,14 +84,7 @@ export class AuthController {
 
   @Get('get-token')
   async getToken(@Req() req: Request) {
-    console.log('=== GET TOKEN DEBUG ===');
-    console.log('Cookies received:', req.cookies);
-    console.log('Cookie header:', req.headers.cookie);
-    console.log('All headers:', req.headers);
-
     const token = req.cookies?.access_token;
-    console.log('Token extracted:', token);
-    console.log('=== END DEBUG ===');
 
     return { access_token: token || null };
   }
@@ -85,8 +93,42 @@ export class AuthController {
   async clearToken(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token', {
       httpOnly: true,
-      secure: false, // Set to false for development
-      sameSite: 'lax', // Change from 'strict' to 'lax' for development
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    res.clearCookie('refresh_token', {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    return { success: true };
+  }
+
+  // Refresh Access Token endpoint
+  @Post('refresh')
+  async refreshToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const refreshToken = req.cookies?.refresh_token;
+
+    if (!refreshToken) {
+      throw new UnauthorizedException('Refresh token not found');
+    }
+
+    const { accessToken } =
+      await this.authService.refreshAccessToken(refreshToken);
+
+    // Set new access token cookie
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
       path: '/',
     });
 

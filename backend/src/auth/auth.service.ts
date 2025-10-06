@@ -11,6 +11,7 @@ import { CreateUser } from '@/users/dto/create-user/create-user';
 import { LoginResponseDto } from '@/auth/dto/login-response.dto/login-response.dto';
 import { UserDto } from './dto/user.dto';
 import { User } from '@generated/prisma';
+import * as process from 'node:process';
 
 // Type for user data without passwordHash
 type UserWithoutPassword = Omit<User, 'passwordHash'>;
@@ -31,7 +32,7 @@ export class AuthService {
     return {
       id: user.id,
       email: user.email,
-      name: user.fullName || user.email.split('@')[0], // Use fullName or fallback to email prefix
+      fullName: user.fullName || user.email.split('@')[0], // Use fullName or fallback to email prefix
       avatar: user.avatar,
     };
   }
@@ -52,22 +53,53 @@ export class AuthService {
 
     return user;
   }
-  login(user: UserDto): LoginResponseDto {
+  generateToken(user: UserDto): string {
     const payload = { sub: user.id, email: user.email };
+    return this.jwtService.sign(payload);
+  }
+
+  // Generate Access Token (short-lived)
+  generateAccessToken(user: UserDto): string {
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      type: 'access',
+    };
+    return this.jwtService.sign(payload, {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN,
+    });
+  }
+
+  // Generate Refresh Token (long-lived)
+  generateRefreshToken(user: UserDto): string {
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      type: 'refresh',
+    };
+    return this.jwtService.sign(payload, {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
+    });
+  }
+
+  async login(
+    email: string,
+    password: string,
+  ): Promise<{ user: UserDto; accessToken: string; refreshToken: string }> {
+    const user = await this.validateUser(email, password);
+    const userDto = this.toUserDto(user);
+    const accessToken = this.generateAccessToken(userDto);
+    const refreshToken = this.generateRefreshToken(userDto);
+
     return {
-      access_token: this.jwtService.sign(payload),
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        avatar: user.avatar,
-      },
+      user: userDto,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
     };
   }
 
   async register(createUserDto: CreateUser) {
     const email = createUserDto.email.toLowerCase().trim();
-    console.log(email);
     const existingEmail = await this.prisma.user.findUnique({
       where: { email: email },
     });
@@ -114,6 +146,46 @@ export class AuthService {
       },
     });
     const userDto = this.toUserDto(user);
-    return this.login(userDto);
+    const accessToken = this.generateToken(userDto);
+    const refreshToken = this.generateRefreshToken(userDto);
+
+    return {
+      user: userDto,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    };
+  }
+
+  // Refresh Access Token using Refresh Token
+  async refreshAccessToken(
+    refreshToken: string,
+  ): Promise<{ accessToken: string }> {
+    try {
+      // Verify refresh token
+      const payload = this.jwtService.verify(refreshToken);
+
+      // Check if it's a refresh token
+      if (payload.type !== 'refresh') {
+        throw new UnauthorizedException('Invalid token type');
+      }
+
+      // Get user data
+      const user = await this.prisma.user.findUnique({
+        where: { id: payload.sub },
+      });
+
+      if (!user) {
+        throw new UnauthorizedException('User not found');
+      }
+
+      const userDto = this.toUserDto(user);
+      const newAccessToken = this.generateAccessToken(userDto);
+
+      return {
+        accessToken: newAccessToken,
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
   }
 }

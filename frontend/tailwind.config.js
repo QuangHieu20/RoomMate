@@ -32,7 +32,58 @@ module.exports = {
     logs: false, // Tắt logs để giảm noise
     themeRoot: ":root",
   },
-  plugins: [require("daisyui")],
+  plugins: [
+    require("daisyui"),
+    function({ addUtilities }) {
+      const newUtilities = {
+        // Title classes
+        '.title-xl': {
+          '@apply text-3xl font-bold text-cyan-500': {},
+        },
+        '.title-lg': {
+          '@apply text-2xl font-semibold text-cyan-500': {},
+        },
+        '.title-md': {
+          '@apply text-xl font-semibold text-cyan-500': {},
+        },
+        '.title-sm': {
+          '@apply text-lg font-semibold text-cyan-500': {},
+        },
+        '.title': {
+          '@apply text-cyan-500': {},
+        },
+        
+        // Button text classes
+        '.btn-text': {
+          '@apply text-black': {},
+        },
+        '.btn-text-secondary': {
+          '@apply text-gray-600': {},
+        },
+        '.btn-text-white': {
+          '@apply text-white': {},
+        },
+        
+        // Common combinations
+        '.card-title': {
+          '@apply title-sm mb-4': {},
+        },
+        '.page-title': {
+          '@apply title-lg mb-6': {},
+        },
+        '.section-title': {
+          '@apply title-md mb-4': {},
+        },
+        '.form-label': {
+          '@apply text-black font-medium': {},
+        },
+        '.error-text': {
+          '@apply text-red-600 text-sm': {},
+        },
+      }
+      addUtilities(newUtilities)
+    }
+  ],
   // Tối ưu hóa: chỉ giữ lại những core plugins cần thiết
   corePlugins: {
     preflight: true,

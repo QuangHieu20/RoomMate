@@ -227,7 +227,7 @@
 </template>
 
 <script setup lang="ts">
-import type {RegisterDto, ToastMessage} from '~/types/auth'
+import type {RegisterDto, ToastMessage} from '~/types'
 import {useValidationSchema} from '~/composables/useValidation'
 import {toTypedSchema} from '@vee-validate/yup'
 

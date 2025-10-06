@@ -4,10 +4,12 @@ import { ValidationPipe } from '@nestjs/common';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
 import { AllExceptionsFilter } from './common/fillters/http-exception.filter';
 import cookieParser from 'cookie-parser';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 async function bootstrap() {
   try {
-    const app = await NestFactory.create(AppModule);
+    const app = await NestFactory.create<NestExpressApplication>(AppModule);
     app.enableCors({
       origin: true, // Allow all origins for development
       credentials: true, // Important for cookies
@@ -17,6 +19,12 @@ async function bootstrap() {
 
     // Cookie parser middleware
     app.use(cookieParser());
+
+
+    // Serve static files from uploads directory
+    app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+      prefix: '/uploads/',
+    });
 
     app.setGlobalPrefix('api/v1');
 

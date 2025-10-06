@@ -125,7 +125,7 @@ model Post {
   // Relations
   user                User              @relation("UserPosts", fields: [userId], references: [id])
   approver            User?             @relation("ApprovedByUser", fields: [approvedBy], references: [id])
-  images              PostImage[]
+  media               PostMedia[]
   views               PostView[]
   conversations       Conversation[]
 
@@ -138,10 +138,11 @@ model Post {
   @@map("posts")
 }
 
-model PostImage {
+model PostMedia {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   postId    String   @map("post_id") @db.Uuid
-  imageUrl  String   @map("image_url") @db.VarChar(500)
+  mediaUrl  String   @map("media_url") @db.VarChar(500)
+  mediaType String   @map("media_type") @db.VarChar(20) // 'image' or 'video'
   altText   String?  @map("alt_text") @db.VarChar(255)
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
@@ -150,7 +151,7 @@ model PostImage {
   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@index([postId, sortOrder])
-  @@map("post_images")
+  @@map("post_media")
 }
 
 model PostView {

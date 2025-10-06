@@ -1,3 +1,70 @@
+<script setup lang="ts">
+import {toTypedSchema} from '@vee-validate/yup'
+import type {LoginDto, ToastMessage} from '~/types'
+import {useValidationSchema} from '~/composables/useValidation'
+
+definePageMeta({
+  layout: 'auth'
+})
+// Composable
+const {login} = useAuth()
+const router = useRouter()
+
+const {loginSchema} = useValidationSchema()
+const validationSchema = computed(() => toTypedSchema(loginSchema.value))
+
+// i18n cho UI
+const {t} = useI18n()
+
+// UI state
+const loading = ref(false)
+const showPassword = ref(false)
+
+// Toast state
+const toast = reactive<ToastMessage & { show: boolean }>({
+  show: false,
+  type: 'info',
+  message: '',
+  duration: 3000
+})
+
+
+// Show toast function
+const showToast = (type: ToastMessage['type'], message: string, duration = 3000) => {
+  toast.type = type
+  toast.message = message
+  toast.duration = duration
+  toast.show = true
+
+  setTimeout(() => {
+    toast.show = false
+  }, duration)
+}
+
+// Handle login
+const handleLogin = async (values: LoginDto | unknown) => {
+  try {
+    loading.value = true
+
+    // Call API (token automatically saved to HttpOnly cookie by backend)
+    const response = await login(values as LoginDto)
+
+    if (response.data.user.id) {
+      // Show success toast
+      showToast('success', t('auth.messages.loginSuccess'))
+      await router.push('/')
+    }
+  } catch (error: any) {
+    console.error('Lỗi đăng nhập:', error)
+
+    // Show error toast with specific error message
+    const errorMessage = error.message || t('auth.messages.loginError')
+    showToast('error', errorMessage)
+  } finally {
+    loading.value = false
+  }
+}
+</script>
 <template>
   <div class="w-full h-full bg-white p-4 sm:p-6 lg:p-8">
     <!-- Header -->
@@ -180,71 +247,3 @@
     </ClientOnly>
   </div>
 </template>
-
-<script setup lang="ts">
-import type {LoginDto, ToastMessage} from '~/types/auth'
-import {useValidationSchema} from '~/composables/useValidation'
-import {toTypedSchema} from '@vee-validate/yup'
-
-definePageMeta({
-  layout: 'auth'
-})
-// Composable
-const {login} = useAuth()
-const router = useRouter()
-
-const {loginSchema} = useValidationSchema()
-const validationSchema = computed(() => toTypedSchema(loginSchema.value))
-
-// i18n cho UI
-const {t} = useI18n()
-
-// UI state
-const loading = ref(false)
-const showPassword = ref(false)
-
-// Toast state
-const toast = reactive<ToastMessage & { show: boolean }>({
-  show: false,
-  type: 'info',
-  message: '',
-  duration: 3000
-})
-
-
-// Show toast function
-const showToast = (type: ToastMessage['type'], message: string, duration = 3000) => {
-  toast.type = type
-  toast.message = message
-  toast.duration = duration
-  toast.show = true
-
-  setTimeout(() => {
-    toast.show = false
-  }, duration)
-}
-
-// Handle login
-const handleLogin = async (values: LoginDto | unknown) => {
-  try {
-    loading.value = true
-
-    // Call API (token automatically saved to HttpOnly cookie by backend)
-    const response = await login(values as LoginDto)
-
-    if (response.data.access_token) {
-      // Show success toast
-      showToast('success', t('auth.messages.loginSuccess'))
-      await router.push('/')
-    }
-  } catch (error: any) {
-    console.error('Lỗi đăng nhập:', error)
-
-    // Show error toast with specific error message
-    const errorMessage = error.message || t('auth.messages.loginError')
-    showToast('error', errorMessage)
-  } finally {
-    loading.value = false
-  }
-}
-</script>
