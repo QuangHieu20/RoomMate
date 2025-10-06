@@ -2,35 +2,35 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   # ==================== BUILD & TEST ====================
   build:
     name: Build & Test
     runs-on: self-hosted
-    
+
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-    - name: 🏗️ Test Build Backend
-      run: |
-        docker build -f .docker/production/backend/Dockerfile .
+      - name: 🏗️ Test Build Backend
+        run: |
+          docker build -f .docker/production/backend/Dockerfile .
 
-    - name: 🏗️ Test Build Frontend
-      run: |
-        docker build -f .docker/production/frontend/Dockerfile .
+      - name: 🏗️ Test Build Frontend
+        run: |
+          docker build -f .docker/production/frontend/Dockerfile .
 
-    - name: 🔧 Fix ownership after Docker builds
-      run: |
-        sudo chown -R ${{ env.USER_ID }}:${{ env.GROUP_ID }} ${{ github.workspace }} || true
-        sudo chmod -R 755 ${{ github.workspace }} || true
+      - name: 🔧 Fix ownership after Docker builds
+        run: |
+          sudo chown -R ${{ env.USER_ID }}:${{ env.GROUP_ID }} ${{ github.workspace }} || true
+          sudo chmod -R 755 ${{ github.workspace }} || true
 
-    - name: ✅ Build Test Completed
-      run: echo "Build test completed successfully!"
+      - name: ✅ Build Test Completed
+        run: echo "Build test completed successfully!"
 
   # ==================== DEPLOY ====================
   deploy:
@@ -39,73 +39,73 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment: production
-    
+
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-    - name: 🔐 Setup Environment Variables from GitHub Secrets
-      run: |
-        echo "🔐 Setting up environment variables from GitHub secrets..."
-        
-        # Create .env file from GitHub secrets
-        cat > .env << EOF
-        # Database Configuration from GitHub Secrets
-        POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-        POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-        POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-        
-        # Backend Configuration
-        NODE_ENV=production
-        PORT=3000
-        DATABASE_HOST=postgres
-        DATABASE_PORT=5432
-        DATABASE_NAME=${{ secrets.POSTGRES_DB }}
-        DATABASE_USER=${{ secrets.POSTGRES_USER }}
-        DATABASE_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-        DATABASE_URL=${{ secrets.DATABASE_URL }}
-        FRONTEND_URL=${{ secrets.FRONTEND_URL }}
-        API_BASE_URL=${{ secrets.API_BASE_URL }}
-        CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
-        JWT_SECRET=${{ secrets.JWT_SECRET }}
-        JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
-        API_PORT=${{ secrets.API_PORT }}
-        API_HOST=${{ secrets.API_HOST }}
-        
-        # Frontend Configuration
-        NUXT_PUBLIC_API_BASE=${{ secrets.NUXT_PUBLIC_API_BASE }}
-        NUXT_PUBLIC_FRONTEND_URL=${{ secrets.NUXT_PUBLIC_FRONTEND_URL }}
-        NUXT_PUBLIC_APP_NAME=${{ secrets.NUXT_PUBLIC_APP_NAME }}
-        EOF
+      - name: 🔐 Setup Environment Variables from GitHub Secrets
+        run: |
+          echo "🔐 Setting up environment variables from GitHub secrets..."
 
-    - name: 🚀 Deploy to Production
-      run: |
-        echo "📥 Code already checked out..."
-        
-        # Stop existing containers
-        echo "⏹️ Stopping existing containers..."
-        docker-compose -f docker-compose.production.yml down || true
-        
-        # Remove old images to save space
-        echo "🧹 Cleaning old images..."
-        docker image prune -f || true
-        
-        # Build and start with production environment
-        echo "🚀 Building and starting containers..."
-        docker-compose -f docker-compose.production.yml build --no-cache
-        docker-compose -f docker-compose.production.yml up -d
-        
-        # Fix ownership after Docker operations
-        echo "🔧 Fixing ownership after Docker operations..."
-        sudo chown -R ${{ env.USER_ID }}:${{ env.GROUP_ID }} ${{ github.workspace }} || true
-        sudo chmod -R 755 ${{ github.workspace }} || true
-        
-        # Health check
-        echo "🏥 Performing health check..."
-        sleep 30
-        curl -f http://localhost/health || { echo "Health check failed"; exit 1; }
-        
-        echo "✅ Deployment completed successfully!"
-        echo "🌐 Frontend: https://roommate.id.vn"
-        echo "🌐 Backend API: https://roommate.id.vn/api"
-        echo "🏥 Health Check: https://roommate.id.vn/health"
+          # Create .env file from GitHub secrets
+          cat > .env << EOF
+          # Database Configuration from GitHub Secrets
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+
+          # Backend Configuration
+          NODE_ENV=production
+          PORT=3000
+          DATABASE_HOST=postgres
+          DATABASE_PORT=5432
+          DATABASE_NAME=${{ secrets.POSTGRES_DB }}
+          DATABASE_USER=${{ secrets.POSTGRES_USER }}
+          DATABASE_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+          API_BASE_URL=${{ secrets.API_BASE_URL }}
+          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+          API_PORT=${{ secrets.API_PORT }}
+          API_HOST=${{ secrets.API_HOST }}
+
+          # Frontend Configuration
+          NUXT_PUBLIC_API_BASE=${{ secrets.NUXT_PUBLIC_API_BASE }}
+          NUXT_PUBLIC_FRONTEND_URL=${{ secrets.NUXT_PUBLIC_FRONTEND_URL }}
+          NUXT_PUBLIC_APP_NAME=${{ secrets.NUXT_PUBLIC_APP_NAME }}
+          EOF
+
+      - name: 🚀 Deploy to Production
+        run: |
+          echo "📥 Code already checked out..."
+
+          # Stop existing containers
+          echo "⏹️ Stopping existing containers..."
+          docker-compose -f docker-compose.production.yml down || true
+
+          # Remove old images to save space
+          echo "🧹 Cleaning old images..."
+          docker image prune -f || true
+
+          # Build and start with production environment
+          echo "🚀 Building and starting containers..."
+          docker-compose -f docker-compose.production.yml build --no-cache
+          docker-compose -f docker-compose.production.yml up -d
+
+          # Fix ownership after Docker operations
+          echo "🔧 Fixing ownership after Docker operations..."
+          sudo chown -R ${{ env.USER_ID }}:${{ env.GROUP_ID }} ${{ github.workspace }} || true
+          sudo chmod -R 755 ${{ github.workspace }} || true
+
+          # Health check
+          echo "🏥 Performing health check..."
+          sleep 30
+          curl -f http://localhost/health || { echo "Health check failed"; exit 1; }
+
+          echo "✅ Deployment completed successfully!"
+          echo "🌐 Frontend: https://roommate.id.vn"
+          echo "🌐 Backend API: https://roommate.id.vn/api"
+          echo "🏥 Health Check: https://roommate.id.vn/health"

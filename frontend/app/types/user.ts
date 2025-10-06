@@ -1,52 +1,52 @@
 // User related interfaces
 export interface User {
-  id: string
-  email: string
-  phone: string
-  fullName: string
-  avatar?: string
-  role: string
-  status: string
-  createdAt: string
-  updatedAt: string
-  emailVerifiedAt: string
+  id: string;
+  email: string;
+  phone: string;
+  fullName: string;
+  avatar?: string;
+  role: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  emailVerifiedAt: string;
 }
 
 // Login DTO
 export interface LoginDto {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
 // Register DTO
 export interface RegisterDto {
-  email: string
-  phone: string
-  fullName: string
-  password: string
-  avatar?: string
+  email: string;
+  phone: string;
+  fullName: string;
+  password: string;
+  avatar?: string;
 }
 
 // Login Response DTO
 export interface LoginResponseDto {
-  success: boolean
-  message: string
+  success: boolean;
+  message: string;
   data: {
-    access_token: string
+    access_token: string;
     user: {
-      id: string
-      email: string
-      name: string
-      avatar: string | null
-    }
-  }
-  timestamp: string
-  path: string
+      id: string;
+      email: string;
+      name: string;
+      avatar: string | null;
+    };
+  };
+  timestamp: string;
+  path: string;
 }
 
 // User Profile Form
 export interface UserProfileForm {
-  fullName: string
-  email: string
-  phone: string
+  fullName: string;
+  email: string;
+  phone: string;
 }

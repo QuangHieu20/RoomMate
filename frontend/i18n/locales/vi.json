@@ -12,7 +12,10 @@
     "next": "Tiếp theo",
     "previous": "Trước",
     "submit": "Gửi",
-    "close": "Đóng"
+    "close": "Đóng",
+    "justNow": "Vừa xong",
+    "hoursAgo": "{hours} giờ trước",
+    "daysAgo": "{days} ngày trước"
   },
   "auth": {
     "login": {
@@ -160,6 +163,21 @@
         "validationError": "Vui lòng kiểm tra lại thông tin"
       }
     },
+    "price": {
+      "monthly": "vnđ/tháng",
+      "daily": "vnđ/ngày"
+    },
+    "contact": {
+      "name": "Liên hệ",
+      "phone": "SĐT",
+      "maxOccupants": "Số người tối đa",
+      "genderRequirement": "Yêu cầu giới tính"
+    },
+    "delete": {
+      "confirmMessage": "Bạn có chắc chắn muốn xóa bài viết này?",
+      "deleting": "Đang xóa...",
+      "deleteButton": "Xoá bài viết"
+    },
     "validation": {
       "provinceRequired": "Vui lòng chọn tỉnh/thành phố",
       "districtRequired": "Vui lòng chọn quận/huyện",
@@ -185,7 +203,8 @@
       "contactNameMin": "Tên liên hệ phải có ít nhất 2 ký tự",
       "contactNameMax": "Tên liên hệ không được quá 50 ký tự",
       "contactPhoneRequired": "Vui lòng nhập số điện thoại liên hệ",
-      "contactPhoneInvalid": "Số điện thoại chỉ được chứa số",
+      "contactPhoneInvalid": "Số điện thoại không hợp lệ",
+      "contactPhoneVietnam": "Số điện thoại phải là số Việt Nam hợp lệ (0xxx, +84xxx, 84xxx)",
       "contactPhoneMin": "Số điện thoại phải có ít nhất 8 số",
       "contactPhoneMax": "Số điện thoại không được quá 15 số",
       "fileRequired": "File là bắt buộc",
@@ -219,6 +238,13 @@
       "changePassword": "Đổi mật khẩu",
       "logout": "Đăng xuất"
     },
+    "navigation": {
+      "newsfeed": "Bảng tin",
+      "createPost": "Đăng tin mới",
+      "notifications": "Thông báo",
+      "changePassword": "Đổi mật khẩu",
+      "logout": "Đăng xuất"
+    },
     "notifications": {
       "title": "Thông báo",
       "newCount": "Bạn có 99+ thông báo mới..."
@@ -237,6 +263,12 @@
       "active": "Đang hiển thị", 
       "pending": "Chờ phê duyệt",
       "expired": "Hết hạn"
+    },
+    "newsfeed": {
+      "noPosts": {
+        "title": "Chưa có bài viết nào",
+        "subtitle": "Hãy tạo bài viết đầu tiên của bạn!"
+      }
     }
   },
   "brand": {

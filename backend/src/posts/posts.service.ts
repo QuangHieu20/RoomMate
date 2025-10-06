@@ -180,4 +180,46 @@ export class PostsService {
       return postWithMedia;
     });
   }
+
+  async deletePostByUserService(
+    postId: string,
+    userId: string,
+  ): Promise<{ message: string; success: boolean }> {
+    // Kiểm tra xem post có tồn tại và thuộc về user không
+    const post = await this.prismaService.post.findFirst({
+      where: {
+        id: postId,
+        userId: userId,
+      },
+      include: {
+        media: true,
+      },
+    });
+
+    if (!post) {
+      throw new Error('Bài viết không tồn tại hoặc bạn không có quyền xóa');
+    }
+
+    // Xóa media files trước
+    if (post.media && post.media.length > 0) {
+      for (const media of post.media) {
+        const fullPath = path.join(process.cwd(), media.mediaUrl);
+        if (fs.existsSync(fullPath)) {
+          fs.unlinkSync(fullPath);
+        }
+      }
+    }
+
+    // Xóa post (cascade sẽ xóa media records)
+    await this.prismaService.post.delete({
+      where: {
+        id: postId,
+      },
+    });
+
+    return {
+      message: 'Xóa bài viết thành công',
+      success: true,
+    };
+  }
 }

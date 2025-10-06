@@ -36,7 +36,9 @@
 
 .post-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 /* Image carousel responsive */
@@ -59,7 +61,7 @@
   .filter-tabs {
     justify-content: center;
   }
-  
+
   .filter-tabs .btn {
     flex: 1;
     min-width: 0;
@@ -105,7 +107,9 @@
     bottom: 1rem;
     right: 1rem;
     z-index: 50;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    box-shadow:
+      0 10px 25px -5px rgba(0, 0, 0, 0.1),
+      0 10px 10px -5px rgba(0, 0, 0, 0.04);
   }
 }
 
@@ -114,7 +118,7 @@
   .main-content {
     padding: 1.5rem;
   }
-  
+
   .post-card {
     margin-bottom: 1.5rem;
   }
@@ -128,7 +132,7 @@
     height: 100vh;
     overflow-y: auto;
   }
-  
+
   .main-content {
     max-width: calc(100vw - 20rem);
   }
@@ -139,7 +143,7 @@
   .sidebar-scroll::-webkit-scrollbar-thumb {
     background: #4b5563;
   }
-  
+
   .sidebar-scroll::-webkit-scrollbar-thumb:hover {
     background: #6b7280;
   }
@@ -152,7 +156,7 @@
   .sidebar {
     display: none !important;
   }
-  
+
   .main-content {
     width: 100% !important;
     padding: 0 !important;

@@ -1,17 +1,27 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 interface Props {
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'ghost' | 'outline' | 'soft'
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
-  disabled?: boolean
-  loading?: boolean
-  type?: 'button' | 'submit' | 'reset'
-  fullWidth?: boolean
-  class?: string
+  variant?:
+    | 'default'
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'warning'
+    | 'error'
+    | 'info'
+    | 'ghost'
+    | 'outline'
+    | 'soft';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  disabled?: boolean;
+  loading?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  fullWidth?: boolean;
+  class?: string;
 }
 
 interface Emits {
-  (e: 'click', event: MouseEvent): void
+  (e: 'click', event: MouseEvent): void;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -21,30 +31,31 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   type: 'button',
   fullWidth: false,
-  class: ''
-})
+  class: '',
+});
 
-const emit = defineEmits<Emits>()
+const emit = defineEmits<Emits>();
 
 const handleClick = (event: MouseEvent) => {
   if (!props.disabled && !props.loading) {
-    emit('click', event)
+    emit('click', event);
   }
-}
+};
 
 // Computed classes for styling
 const buttonClasses = computed(() => {
-  const baseClasses = 'btn font-medium transition-all duration-200 focus:outline-none'
-  
+  const baseClasses =
+    'btn font-medium transition-all duration-200 focus:outline-none';
+
   // Size classes
   const sizeClasses = {
     xs: 'btn-xs px-2 py-1 text-xs',
     sm: 'btn-sm px-3 py-1.5 text-sm',
     md: 'btn-md px-4 py-2 text-base',
     lg: 'btn-lg px-6 py-3 text-lg',
-    xl: 'btn-xl px-8 py-4 text-xl'
-  }
-  
+    xl: 'btn-xl px-8 py-4 text-xl',
+  };
+
   // Variant classes
   const variantClasses = {
     default: 'bg-transparent border-none text-gray-700 hover:text-gray-900',
@@ -55,33 +66,37 @@ const buttonClasses = computed(() => {
     error: 'btn-error bg-red-500 hover:bg-red-700 text-white ',
     info: 'btn-info bg-cyan-500 hover:bg-cyan-700 text-white ',
     ghost: 'btn-ghost bg-transparent hover:bg-gray-100 text-gray-700 ',
-    outline: 'btn-outline border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white',
-    soft: 'btn-soft'
-  }
-  
+    outline:
+      'btn-outline border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white',
+    soft: 'btn-soft',
+  };
+
   // State classes
-  const stateClasses = props.disabled 
-    ? 'opacity-50 cursor-not-allowed' 
-    : props.loading 
-    ? 'opacity-75 cursor-wait' 
-    : 'cursor-pointer'
-  
+  const stateClasses = props.disabled
+    ? 'opacity-50 cursor-not-allowed'
+    : props.loading
+      ? 'opacity-75 cursor-wait'
+      : 'cursor-pointer';
+
   // Full width class
-  const widthClass = props.fullWidth ? 'w-full' : ''
-  
+  const widthClass = props.fullWidth ? 'w-full' : '';
+
   return [
     baseClasses,
     sizeClasses[props.size],
     variantClasses[props.variant],
     stateClasses,
     widthClass,
-    props.class // Custom class với priority cao nhất
-  ].join(' ')
-})
+    props.class, // Custom class với priority cao nhất
+  ].join(' ');
+});
 </script>
 
 <template>
-  <div v-if="$slots.subTitle" class="inline-flex items-center border border-gray-300 rounded-lg overflow-hidden">
+  <div
+    v-if="$slots.subTitle"
+    class="inline-flex items-center border border-gray-300 rounded-lg overflow-hidden"
+  >
     <!-- Input field (left side) -->
     <button
       :type="type"
@@ -91,22 +106,23 @@ const buttonClasses = computed(() => {
       class="flex-1 bg-white"
     >
       <!-- Loading spinner -->
-      <span v-if="loading" class="loading loading-spinner loading-sm mr-2"></span>
-      
+      <span
+        v-if="loading"
+        class="loading loading-spinner loading-sm mr-2"
+      ></span>
+
       <!-- Button content -->
       <slot>
         {{ $slots.default ? '' : 'Button' }}
       </slot>
     </button>
-    
+
     <!-- SubTitle section (right side) -->
     <div class="bg-gray-200 text-cyan-500 px-3 py-2 flex items-center">
-      <slot name="subTitle">
-        SubTitle
-      </slot>
+      <slot name="subTitle"> SubTitle </slot>
     </div>
   </div>
-  
+
   <!-- Default button without subTitle -->
   <button
     v-else
@@ -117,7 +133,7 @@ const buttonClasses = computed(() => {
   >
     <!-- Loading spinner -->
     <span v-if="loading" class="loading loading-spinner loading-sm mr-2"></span>
-    
+
     <!-- Button content -->
     <slot>
       {{ $slots.default ? '' : 'Button' }}

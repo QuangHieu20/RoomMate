@@ -5,6 +5,8 @@ import {
   HttpCode,
   HttpStatus,
   Post,
+  Delete,
+  Param,
   UseGuards,
   Request,
   UseInterceptors,
@@ -101,12 +103,26 @@ export class PostsController {
     @Body() dto: CreatePostByUserIdDto,
     @UploadedFiles() files: { mediaFiles?: Express.Multer.File[] },
   ): Promise<PostModel> {
-
     const userId = req.user?.userId;
     if (!userId) {
       throw new Error('User ID not found in JWT token');
     }
 
     return this.postService.createPostByUserService(userId, dto, files);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
+  async deletePost(
+    @Param('id') postId: string,
+    @Request() req: any,
+  ): Promise<{ message: string; success: boolean }> {
+    const userId = req.user?.userId;
+    if (!userId) {
+      throw new Error('User ID not found in JWT token');
+    }
+
+    return this.postService.deletePostByUserService(postId, userId);
   }
 }

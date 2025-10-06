@@ -4,12 +4,12 @@ interface Props {
   // Add any props needed for logout
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 
 // Emits
 const emit = defineEmits<{
   // Add any emits needed for logout
-}>()
+}>();
 </script>
 
 <template>

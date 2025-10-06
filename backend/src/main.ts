@@ -20,7 +20,6 @@ async function bootstrap() {
     // Cookie parser middleware
     app.use(cookieParser());
 
-
     // Serve static files from uploads directory
     app.useStaticAssets(join(__dirname, '..', 'uploads'), {
       prefix: '/uploads/',
