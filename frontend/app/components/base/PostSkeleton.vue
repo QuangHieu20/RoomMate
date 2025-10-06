@@ -1,19 +1,25 @@
 <script setup lang="ts">
 interface Props {
-  count?: number
+  count?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  count: 3
-})
+  count: 3,
+});
 </script>
 
 <template>
-  <div v-for="i in count" :key="i" class="w-full flex flex-col gap-4 min-w-0 min-h-0 bg-white rounded-[16px] border border-border-light p-6 mb-8">
+  <div
+    v-for="i in count"
+    :key="i"
+    class="w-full flex flex-col gap-4 min-w-0 min-h-0 bg-white rounded-[16px] border border-border-light p-6 mb-8"
+  >
     <!-- Header skeleton -->
     <div class="flex items-center gap-4 mb-6">
       <!-- Avatar skeleton -->
-      <div class="w-[68px] h-[68px] rounded-full bg-gray-200 animate-pulse"></div>
+      <div
+        class="w-[68px] h-[68px] rounded-full bg-gray-200 animate-pulse"
+      ></div>
       <!-- Name and time skeleton -->
       <div class="flex flex-col gap-2">
         <div class="h-4 w-32 bg-gray-200 rounded animate-pulse"></div>
@@ -57,7 +63,8 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

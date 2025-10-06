@@ -1,10 +1,10 @@
 <script setup lang="ts">
 interface Props {
-  count?: number
-  height?: string
-  width?: string
-  borderRadius?: string
-  animated?: boolean
+  count?: number;
+  height?: string;
+  width?: string;
+  borderRadius?: string;
+  animated?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -12,20 +12,20 @@ const props = withDefaults(defineProps<Props>(), {
   height: '20px',
   width: '100%',
   borderRadius: '8px',
-  animated: true
-})
+  animated: true,
+});
 </script>
 
 <template>
-  <div 
-    v-for="i in count" 
+  <div
+    v-for="i in count"
     :key="i"
     class="skeleton"
     :class="{ 'animate-pulse': animated }"
     :style="{
       height: height,
       width: width,
-      borderRadius: borderRadius
+      borderRadius: borderRadius,
     }"
   ></div>
 </template>
@@ -40,7 +40,8 @@ const props = withDefaults(defineProps<Props>(), {
 }
 
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

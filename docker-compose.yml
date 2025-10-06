@@ -1,13 +1,13 @@
-version: "3.8"
+version: '3.8'
 services:
   backend:
     build:
-      context: "."
+      context: '.'
       dockerfile: './.docker/local/backend/Dockerfile'
-    container_name: "roommate_be"
+    container_name: 'roommate_be'
     ports:
-      - "3000:3000"
-      - "9229:9229"
+      - '3000:3000'
+      - '9229:9229'
     environment:
       - NODE_ENV=development
       - PORT=3000
@@ -26,14 +26,14 @@ services:
 
   postgres:
     image: postgres:15-alpine
-    container_name: "roommate_postgres"
+    container_name: 'roommate_postgres'
     restart: unless-stopped
     environment:
       - POSTGRES_DB=roommate_db
       - POSTGRES_USER=roommate_user
       - POSTGRES_PASSWORD=roommate_password
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/database/init:/docker-entrypoint-initdb.d
@@ -42,9 +42,9 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: "roommate_nginx"
+    container_name: 'roommate_nginx'
     ports:
-      - "80:80"
+      - '80:80'
     volumes:
       - ./.docker/local/nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:

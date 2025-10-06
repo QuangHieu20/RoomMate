@@ -1,139 +1,266 @@
-# RoomMate Project
+# 🏠 RoomMate - Tìm Phòng Trọ Thông Minh
 
 ## 📋 Tổng quan dự án
 
-H là 1 developer, do công ty xa nhà nên H quyết định lên facebook  tìm phòng trọ nhưng vì phải join 1 đống group, mất rất nhiều thời gian do chờ duyệt vào group và rất nhiều bài post không liên quan đến phòng trọ H cần tìm, vì sự bực tức đó project này ra đời.
+RoomMate là một nền tảng tìm kiếm phòng trọ thông minh, được phát triển để giải quyết những khó khăn khi tìm phòng trọ trên Facebook. Thay vì phải join nhiều group, chờ duyệt và lọc qua hàng trăm bài post không liên quan, RoomMate cung cấp một giải pháp tập trung và hiệu quả.
 
-## 🛠️ Công nghệ sử dụng
+### ✨ Tính năng chính
+- 🔍 **Tìm kiếm thông minh**: Lọc theo khu vực, giá cả, loại phòng
+- 📱 **Giao diện thân thiện**: Responsive design, dễ sử dụng
+- 🔐 **Bảo mật cao**: JWT authentication, HttpOnly cookies
+- 📸 **Upload media**: Hỗ trợ ảnh và video
+- 🌐 **Đa ngôn ngữ**: Tiếng Việt và Tiếng Anh
+- 💬 **Chat realtime**: Liên hệ trực tiếp với chủ phòng
 
-### Backend
-- **Framework**: NestJS
-- **Language**: TypeScript
-- **Database**: PostgreSQL
+## 🛠️ Tech Stack
 
-### Frontend
-- **Framework**: Nuxt.js
-- **Language**: TypeScript
-- **UI Library**: Tailwind CSS
-- **State Management**: Pinia
+### Backend (NestJS)
+- **Framework**: NestJS 11.0.1
+- **Language**: TypeScript 5.7.3
+- **Database**: PostgreSQL + Prisma 6.16.2
+- **Authentication**: JWT + Passport + bcrypt
+- **File Upload**: Multer 2.0.2
+- **Validation**: class-validator + class-transformer
+- **Testing**: Jest 30.0.0
+
+### Frontend (Nuxt 4)
+- **Framework**: Nuxt 4.1.2 + Vue 3.5.21
+- **Styling**: Tailwind CSS 3.4.17 + DaisyUI 5.1.18
+- **Validation**: VeeValidate 4.15.1 + Yup 1.7.1
+- **Icons**: Heroicons Vue 2.2.0
+- **Carousel**: Vue3-carousel 0.16.0
+- **i18n**: @nuxtjs/i18n 10.1.0
+- **Package Manager**: Yarn
 
 ### Infrastructure & DevOps
 - **Containerization**: Docker & Docker Compose
-- **Reverse Proxy**: Nginx
-- **Database**: PostgreSQL
-- **Environment**: Development (Local)
+- **Database**: PostgreSQL 15-alpine
+- **Environment**: Development + Production ready
 
-## 📦 Versions
+## 📁 Cấu trúc dự án
 
-### Infrastructure
-- **Docker**: Latest
-- **Docker Compose**: 3.8
-- **PostgreSQL**: 15-alpine
-- **Nginx**: alpine
-- **Node.js**: 20-alpine
+```
+RoomMate/
+├── backend/                    # NestJS Backend
+│   ├── src/
+│   │   ├── auth/              # Authentication module
+│   │   ├── posts/             # Posts module
+│   │   ├── users/             # Users module
+│   │   ├── prisma/            # Database service
+│   │   └── common/            # Shared utilities
+│   ├── prisma/                # Database schema & migrations
+│   ├── uploads/               # File uploads
+│   └── package.json
+├── frontend/                  # Nuxt 4 Frontend
+│   ├── app/
+│   │   ├── components/        # Vue components
+│   │   │   ├── base/         # Base UI components
+│   │   │   └── forms/        # Form components
+│   │   ├── composables/      # Vue composables
+│   │   ├── pages/            # Pages/routes
+│   │   ├── types/            # TypeScript types
+│   │   └── utils/            # Utility functions
+│   ├── i18n/locales/         # i18n translations
+│   └── nuxt.config.ts
+├── docker-compose.yml        # Docker services
+├── .prettierrc               # Code formatting
+└── README.md
+```
 
-## 🚀 Hướng dẫn Setup Môi trường Local
+## 🚀 Hướng dẫn Setup
 
 ### Prerequisites
-- Docker & Docker Compose
-- Git
-- Terminal/Command Line
+
+- **Node.js**: 18+ 
+- **Yarn**: Latest
+- **Docker & Docker Compose**: Latest
+- **Git**: Latest
 
 ### 1. Clone Repository
+
 ```bash
 git clone <repository-url>
 cd RoomMate
 ```
 
-### 2. Cấu trúc Project
-```
-RoomMate/
-├── backend/                 # NestJS Backend
-│   ├── src/
-│   ├── package.json
-│   └── tsconfig.json
-├── frontend/               # Nuxt.js Frontend
-│   ├── app/
-│   ├── package.json
-│   └── nuxt.config.ts
-├── .docker/               # Docker configurations
-│   └── local/
-│       ├── backend/
-│       │   └── Dockerfile
-│       └── nginx/
-│           └── nginx.conf
-├── docker-compose.yml     # Docker services orchestration
-└── README.md
-```
+### 2. Backend Setup
 
-### 3. Khởi động Services
-
-#### Cách 1: Khởi động tất cả services
 ```bash
-# Build và chạy tất cả services
+cd backend
+
+# Install dependencies
+yarn install
+
+# Setup environment
+cp .env.example .env
+# Edit .env with your database credentials
+
+# Setup database
+npx prisma generate
+npx prisma db push
+
+# Start development server
+yarn start:dev
+```
+
+### 3. Frontend Setup
+
+```bash
+cd frontend
+
+# Install dependencies
+yarn install
+
+# Start development server
+yarn dev
+```
+
+### 4. Docker Setup (Alternative)
+
+```bash
+# Build and run all services
 docker-compose up --build -d
 
-# Xem logs
+# View logs
 docker-compose logs -f
 
-# Xem trạng thái services
-docker-compose ps
+# Stop services
+docker-compose down
 ```
 
+### 5. Docker Production Database Setup
 
-### 3. Kiểm tra Services
-
-#### Backend (NestJS)
 ```bash
-# Test API trực tiếp
-curl http://localhost:3000
+# Start production services (Prisma migrations will run automatically)
+docker-compose -f docker-compose.production.yml up -d
 
-# Xem logs backend
-docker-compose logs -f backend
+# Manual Prisma commands (if needed)
+docker-compose -f docker-compose.production.yml exec roommate_be_prod npx prisma generate    # Generate client
+docker-compose -f docker-compose.production.yml exec roommate_be_prod npx prisma db push     # Push schema
+docker-compose -f docker-compose.production.yml exec roommate_be_prod npx prisma migrate deploy  # Deploy migrations
+docker-compose -f docker-compose.production.yml exec roommate_be_prod npx prisma db seed      # Seed database
+docker-compose -f docker-compose.production.yml exec roommate_be_prod npx prisma studio       # Open Prisma Studio
 ```
 
-#### Frontend (Nuxt.js)
+> **💡 Lưu ý**: Prisma migrations sẽ tự động chạy khi container backend khởi động nhờ `command` trong docker-compose.production.yml.
+
+## 🔧 Development Commands
+
+### Backend Commands
+
 ```bash
-# Test frontend
-curl http://localhost:3001
+cd backend
 
-# Xem logs frontend
-docker-compose logs -f frontend
+# Development
+yarn start:dev          # Start with hot reload
+yarn start:debug        # Start with debug mode
+
+# Database
+npx prisma generate     # Generate Prisma client
+npx prisma db push      # Push schema to database
+npx prisma studio       # Open Prisma Studio
+
+# Docker Production Database Commands
+docker-compose -f docker-compose.production.yml exec roommate_be_prod npx prisma generate    # Generate client in container
+docker-compose -f docker-compose.production.yml exec roommate_be_prod npx prisma db push     # Push schema in container
+docker-compose -f docker-compose.production.yml exec roommate_be_prod npx prisma migrate deploy  # Deploy migrations
+docker-compose -f docker-compose.production.yml exec roommate_be_prod npx prisma db seed      # Seed database (if configured)
+
+# Testing
+yarn test               # Run unit tests
+yarn test:e2e           # Run e2e tests
+yarn test:cov           # Run with coverage
+
+# Build
+yarn build              # Build for production
+yarn start:prod         # Start production server
 ```
 
-#### Database (PostgreSQL)
+### Frontend Commands
+
 ```bash
-# Kết nối database
-docker exec -it roommate_postgres psql -U roommate_user -d roommate_db
+cd frontend
 
-# Xem databases
-docker exec roommate_postgres psql -U roommate_user -d postgres -c "\l"
+# Development
+yarn dev                # Start development server
+yarn build              # Build for production
+yarn preview            # Preview production build
 
-# Xem tables
-docker exec roommate_postgres psql -U roommate_user -d roommate_db -c "\dt"
+# Code Quality
+yarn lint               # Run ESLint
+yarn format             # Format with Prettier
 ```
 
-#### Nginx (Reverse Proxy)
-```bash
-# Test qua nginx
-curl http://localhost:80
+## 🌐 API Endpoints
 
-# Test health check
-curl http://localhost:80/health
+### Authentication
+- `POST /api/v1/auth/login` - Đăng nhập
+- `POST /api/v1/auth/register` - Đăng ký
+- `POST /api/v1/auth/logout` - Đăng xuất
 
-# Xem logs nginx
-docker-compose logs -f nginx
+### Posts
+- `GET /api/v1/posts` - Lấy danh sách bài đăng
+- `POST /api/v1/posts/create` - Tạo bài đăng mới
+- `DELETE /api/v1/posts/:id` - Xóa bài đăng
+
+### Users
+- `GET /api/v1/users/profile` - Lấy thông tin user
+- `PUT /api/v1/users/profile` - Cập nhật thông tin
+
+## 🔐 Environment Variables
+
+### Backend (.env)
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/roommate_db"
+JWT_SECRET="your-jwt-secret"
+ACCESS_TOKEN_EXPIRES_IN="15m"
+REFRESH_TOKEN_EXPIRES_IN="7d"
 ```
-vices
-```bash
-# Rebuild chỉ backend
-docker-compose build backend
 
-# Rebuild và restart
-docker-compose up --build backend -d
-
-# Rebuild tất cả
-docker-compose build
+### Frontend (.env)
+```env
+NUXT_PUBLIC_API_BASE="http://localhost:3000/api/v1"
+NUXT_PUBLIC_MEDIA_BASE="http://localhost:3000"
 ```
-**Last Updated**: 24/09/2025
-**Version**: 1.0.0-dev
+
+## 📱 Features
+
+### ✅ Đã hoàn thành
+- [x] Authentication (Login/Register)
+- [x] Post Management (CRUD)
+- [x] File Upload (Images/Videos)
+- [x] Responsive Design
+- [x] i18n Support (VI/EN)
+- [x] Form Validation
+- [x] Database Integration
+
+### 🚧 Đang phát triển
+- [ ] Real-time Chat
+- [ ] Advanced Search Filters
+- [ ] Push Notifications
+- [ ] Payment Integration
+- [ ] Admin Dashboard
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+**Nguyen Quang Hieu**
+- GitHub: [@nguyenquanghieu](https://github.com/nguyenquanghieu)
+- Email: your.email@example.com
+
+---
+
+**Last Updated**: 29/12/2024  
+**Version**: 1.0.0-dev  
+**Status**: 🚧 In Development

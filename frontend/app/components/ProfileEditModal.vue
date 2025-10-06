@@ -2,7 +2,7 @@
   <div v-if="show" class="modal modal-open">
     <div class="modal-box">
       <h3 class="font-bold text-lg mb-4">Chỉnh sửa thông tin</h3>
-      
+
       <form @submit.prevent="handleSubmit" class="space-y-4">
         <!-- Full Name -->
         <div class="form-control">
@@ -17,7 +17,7 @@
             required
           />
         </div>
-        
+
         <!-- Email (Read-only) -->
         <div class="form-control">
           <label class="label">
@@ -30,7 +30,7 @@
             disabled
           />
         </div>
-        
+
         <!-- Phone -->
         <div class="form-control">
           <label class="label">
@@ -43,7 +43,7 @@
             placeholder="Nhập số điện thoại"
           />
         </div>
-        
+
         <!-- Actions -->
         <div class="modal-action">
           <button type="button" @click="$emit('close')" class="btn btn-ghost">
@@ -60,52 +60,56 @@
 
 <script setup lang="ts">
 interface Props {
-  show: boolean
+  show: boolean;
   initialData: {
-    fullName: string
-    email: string
-    phone: string
-  }
+    fullName: string;
+    email: string;
+    phone: string;
+  };
 }
 
 interface Emits {
-  (e: 'close'): void
-  (e: 'update', data: { fullName: string; phone: string }): void
+  (e: 'close'): void;
+  (e: 'update', data: { fullName: string; phone: string }): void;
 }
 
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const props = defineProps<Props>();
+const emit = defineEmits<Emits>();
 
 // Form data
 const form = reactive({
   fullName: '',
   email: '',
-  phone: ''
-})
+  phone: '',
+});
 
 // UI state
-const loading = ref(false)
+const loading = ref(false);
 
 // Watch for prop changes
-watch(() => props.initialData, (newData) => {
-  if (newData) {
-    form.fullName = newData.fullName
-    form.email = newData.email
-    form.phone = newData.phone
-  }
-}, { immediate: true })
+watch(
+  () => props.initialData,
+  newData => {
+    if (newData) {
+      form.fullName = newData.fullName;
+      form.email = newData.email;
+      form.phone = newData.phone;
+    }
+  },
+  { immediate: true }
+);
 
 // Handle form submission
 const handleSubmit = async () => {
-  loading.value = true
-  
+  loading.value = true;
+
   try {
     emit('update', {
       fullName: form.fullName,
-      phone: form.phone
-    })
+      phone: form.phone,
+    });
   } finally {
-    loading.value = false
+    loading.value = false;
   }
-}
+};
 </script>

@@ -1,40 +1,83 @@
 module.exports = {
   content: [
-    "./app/**/*.{js,vue,ts}",
-    "./components/**/*.{js,vue,ts}",
-    "./layouts/**/*.vue",
-    "./pages/**/*.vue",
-    "./plugins/**/*.{js,ts}",
-    "./app.vue",
-    "./error.vue"
+    './app/**/*.{js,vue,ts}',
+    './components/**/*.{js,vue,ts}',
+    './layouts/**/*.vue',
+    './pages/**/*.vue',
+    './plugins/**/*.{js,ts}',
+    './app.vue',
+    './error.vue',
   ],
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['Fira Sans', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+        sans: [
+          'Fira Sans',
+          'ui-sans-serif',
+          'system-ui',
+          '-apple-system',
+          'BlinkMacSystemFont',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'Noto Sans',
+          'sans-serif',
+        ],
       },
       colors: {
-        'light': '#FAFAFB',
-        'primary': '#FAFAFB',
-        'surface': '#FAFAFB',
+        light: '#FAFAFB',
+        primary: '#FAFAFB',
+        surface: '#FAFAFB',
         'border-light': '#EAEAEA',
       },
     },
   },
   // Tối ưu hóa: chỉ giữ lại những theme cần thiết
   daisyui: {
-    themes: ["light", "dark", "cupcake", "emerald", "corporate", "synthwave", "retro", "cyberpunk", "valentine", "halloween", "forest", "aqua", "lofi", "pastel", "fantasy", "wireframe", "black", "luxury", "dracula", "cmyk", "autumn", "business", "acid", "lemonade", "night", "coffee", "winter", "dim", "nord", "sunset"],
+    themes: [
+      'light',
+      'dark',
+      'cupcake',
+      'emerald',
+      'corporate',
+      'synthwave',
+      'retro',
+      'cyberpunk',
+      'valentine',
+      'halloween',
+      'forest',
+      'aqua',
+      'lofi',
+      'pastel',
+      'fantasy',
+      'wireframe',
+      'black',
+      'luxury',
+      'dracula',
+      'cmyk',
+      'autumn',
+      'business',
+      'acid',
+      'lemonade',
+      'night',
+      'coffee',
+      'winter',
+      'dim',
+      'nord',
+      'sunset',
+    ],
     // Tối ưu hóa DaisyUI
     base: true,
     styled: true,
     utils: true,
-    prefix: "",
+    prefix: '',
     logs: false, // Tắt logs để giảm noise
-    themeRoot: ":root",
+    themeRoot: ':root',
   },
   plugins: [
-    require("daisyui"),
-    function({ addUtilities }) {
+    require('daisyui'),
+    function ({ addUtilities }) {
       const newUtilities = {
         // Title classes
         '.title-xl': {
@@ -52,7 +95,7 @@ module.exports = {
         '.title': {
           '@apply text-cyan-500': {},
         },
-        
+
         // Button text classes
         '.btn-text': {
           '@apply text-black': {},
@@ -63,7 +106,7 @@ module.exports = {
         '.btn-text-white': {
           '@apply text-white': {},
         },
-        
+
         // Common combinations
         '.card-title': {
           '@apply title-sm mb-4': {},
@@ -80,9 +123,9 @@ module.exports = {
         '.error-text': {
           '@apply text-red-600 text-sm': {},
         },
-      }
-      addUtilities(newUtilities)
-    }
+      };
+      addUtilities(newUtilities);
+    },
   ],
   // Tối ưu hóa: chỉ giữ lại những core plugins cần thiết
   corePlugins: {
@@ -108,5 +151,5 @@ module.exports = {
     objectPosition: true,
     overflow: true,
     overscrollBehavior: true,
-  }
-}
+  },
+};

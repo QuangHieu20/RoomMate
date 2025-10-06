@@ -1,11 +1,9 @@
-<script lang="ts">
-
-</script>
+<script lang="ts"></script>
 <template>
   <div class="min-h-screen bg-white">
     <!-- Navigation -->
-   <AppHeader/>
-    
+    <AppHeader />
+
     <!-- Main Content -->
     <main class="w-full min-w-0 bg-light">
       <div class="w-9/12 mx-auto pt-[32px]">

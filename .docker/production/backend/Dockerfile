@@ -29,6 +29,9 @@ COPY backend/prisma ./prisma
 # Generate Prisma client before build
 RUN npx prisma generate
 
+# Optional: Deploy migrations during build (uncomment if needed)
+# RUN npx prisma migrate deploy
+
 # Build the application
 RUN yarn build && \
     # Remove source maps and dev files to reduce image size
