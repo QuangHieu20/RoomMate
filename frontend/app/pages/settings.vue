@@ -96,7 +96,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ToastMessage } from '~/types/auth'
+import type { ToastMessage } from '~/types'
 
 definePageMeta({
   layout: 'default'

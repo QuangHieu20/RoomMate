@@ -1,3 +1,17 @@
+// User related interfaces
+export interface User {
+  id: string
+  email: string
+  phone: string
+  fullName: string
+  avatar?: string
+  role: string
+  status: string
+  createdAt: string
+  updatedAt: string
+  emailVerifiedAt: string
+}
+
 // Login DTO
 export interface LoginDto {
   email: string
@@ -30,33 +44,9 @@ export interface LoginResponseDto {
   path: string
 }
 
-// User interface
-export interface User {
-  id: string
+// User Profile Form
+export interface UserProfileForm {
+  fullName: string
   email: string
   phone: string
-  fullName: string
-  avatar?: string
-  role: string
-  status: string
-  createdAt: string
-  updatedAt: string
-  emailVerifiedAt: string
-}
-
-// Form validation errors
-export interface FormErrors {
-  email?: string
-  password?: string
-  phone?: string
-  fullName?: string
-}
-
-// Toast message types
-export type ToastType = 'success' | 'error' | 'warning' | 'info'
-
-export interface ToastMessage {
-  type: ToastType
-  message: string
-  duration?: number
 }

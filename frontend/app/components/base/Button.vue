@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 interface Props {
-  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'ghost' | 'outline'
+  variant?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'info' | 'ghost' | 'outline' | 'soft'
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   disabled?: boolean
   loading?: boolean
   type?: 'button' | 'submit' | 'reset'
   fullWidth?: boolean
+  class?: string
 }
 
 interface Emits {
@@ -19,7 +20,8 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   loading: false,
   type: 'button',
-  fullWidth: false
+  fullWidth: false,
+  class: ''
 })
 
 const emit = defineEmits<Emits>()
@@ -53,7 +55,8 @@ const buttonClasses = computed(() => {
     error: 'btn-error bg-red-500 hover:bg-red-700 text-white ',
     info: 'btn-info bg-cyan-500 hover:bg-cyan-700 text-white ',
     ghost: 'btn-ghost bg-transparent hover:bg-gray-100 text-gray-700 ',
-    outline: 'btn-outline border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white'
+    outline: 'btn-outline border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white',
+    soft: 'btn-soft'
   }
   
   // State classes
@@ -71,13 +74,42 @@ const buttonClasses = computed(() => {
     sizeClasses[props.size],
     variantClasses[props.variant],
     stateClasses,
-    widthClass
+    widthClass,
+    props.class // Custom class với priority cao nhất
   ].join(' ')
 })
 </script>
 
 <template>
+  <div v-if="$slots.subTitle" class="inline-flex items-center border border-gray-300 rounded-lg overflow-hidden">
+    <!-- Input field (left side) -->
+    <button
+      :type="type"
+      :class="buttonClasses"
+      :disabled="disabled || loading"
+      @click="handleClick"
+      class="flex-1 bg-white"
+    >
+      <!-- Loading spinner -->
+      <span v-if="loading" class="loading loading-spinner loading-sm mr-2"></span>
+      
+      <!-- Button content -->
+      <slot>
+        {{ $slots.default ? '' : 'Button' }}
+      </slot>
+    </button>
+    
+    <!-- SubTitle section (right side) -->
+    <div class="bg-gray-200 text-cyan-500 px-3 py-2 flex items-center">
+      <slot name="subTitle">
+        SubTitle
+      </slot>
+    </div>
+  </div>
+  
+  <!-- Default button without subTitle -->
   <button
+    v-else
     :type="type"
     :class="buttonClasses"
     :disabled="disabled || loading"

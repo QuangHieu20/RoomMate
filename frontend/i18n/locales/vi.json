@@ -82,6 +82,128 @@
       "registerError": "Có lỗi xảy ra, vui lòng thử lại!"
     }
   },
+  "post": {
+    "create": {
+      "title": "Tạo bài đăng",
+      "subtitle": "Chia sẻ thông tin phòng trọ của bạn",
+      "tabs": {
+        "rentOut": "Cho thuê trọ",
+        "findRoom": "Tìm trọ/Người ở ghép"
+      },
+      "sections": {
+        "location": "Khu vực",
+        "roomInfo": "Thông tin phòng",
+        "content": "Nội dung bài đăng",
+        "contact": "Thông tin liên hệ",
+        "description": "Thông tin mô tả",
+        "requirements": "Yêu cầu"
+      },
+      "fields": {
+        "province": "Tỉnh/thành phố",
+        "district": "Quận/huyện",
+        "ward": "Phường/xã",
+        "address": "Địa chỉ chính xác",
+        "roomType": "Loại phòng",
+        "price": "Giá",
+        "priceType": "Loại giá",
+        "area": "Diện tích",
+        "title": "Tiêu đề",
+        "description": "Mô tả",
+        "genderRequirement": "Yêu cầu giới tính",
+        "maxOccupants": "Số người tối đa",
+        "availableFrom": "Thời gian có thể vào ở",
+        "contactName": "Tên liên hệ",
+        "contactPhone": "Số điện thoại"
+      },
+      "placeholders": {
+        "selectProvince": "Chọn tỉnh/thành phố",
+        "selectDistrict": "Chọn quận/huyện",
+        "selectWard": "Chọn phường/xã",
+        "enterAddress": "Địa chỉ chính xác",
+        "enterPrice": "Nhập giá thuê",
+        "enterArea": "Nhập diện tích",
+        "enterTitle": "Nhập tiêu đề",
+        "enterDescription": "Nhập mô tả",
+        "enterContactName": "Nhập tên liên hệ",
+        "enterContactPhone": "Nhập số điện thoại",
+        "selectRoomType": "Chọn loại phòng",
+        "selectGender": "Chọn giới tính",
+        "search": "Tìm kiếm..."
+      },
+      "options": {
+        "roomTypes": {
+          "single_room": "Phòng đơn",
+          "shared_room": "Phòng chung",
+          "apartment": "Căn hộ",
+          "house": "Nhà riêng",
+          "studio": "Studio"
+        },
+        "priceTypes": {
+          "monthly": "Tháng",
+          "daily": "Ngày",
+          "yearly": "Năm"
+        },
+        "genderRequirements": {
+          "any": "Bất kỳ",
+          "male": "Nam",
+          "female": "Nữ"
+        }
+      },
+      "buttons": {
+        "submit": "Đăng tin",
+        "submitLoading": "Đang xử lý...",
+        "reset": "Làm mới"
+      },
+      "messages": {
+        "createSuccess": "Đăng tin thành công!",
+        "createError": "Có lỗi xảy ra khi đăng tin",
+        "validationError": "Vui lòng kiểm tra lại thông tin"
+      }
+    },
+    "validation": {
+      "provinceRequired": "Vui lòng chọn tỉnh/thành phố",
+      "districtRequired": "Vui lòng chọn quận/huyện",
+      "wardRequired": "Vui lòng chọn phường/xã",
+      "addressRequired": "Vui lòng nhập địa chỉ chính xác",
+      "addressMin": "Địa chỉ phải có ít nhất 10 ký tự",
+      "addressMax": "Địa chỉ không được quá 200 ký tự",
+      "roomTypeRequired": "Vui lòng chọn loại phòng",
+      "priceRequired": "Vui lòng nhập giá thuê",
+      "priceMin": "Giá thuê phải từ 100,000 VNĐ",
+      "priceMax": "Giá thuê không được quá 50,000,000 VNĐ",
+      "priceTypeRequired": "Vui lòng chọn loại giá",
+      "areaRequired": "Vui lòng nhập diện tích",
+      "areaMin": "Diện tích phải từ 5m²",
+      "areaMax": "Diện tích không được quá 500m²",
+      "titleRequired": "Vui lòng nhập tiêu đề",
+      "titleMin": "Tiêu đề phải có ít nhất 10 ký tự",
+      "titleMax": "Tiêu đề không được quá 150 ký tự",
+      "descriptionRequired": "Vui lòng nhập mô tả",
+      "descriptionMin": "Mô tả phải có ít nhất 20 ký tự",
+      "descriptionMax": "Mô tả không được quá 5000 ký tự",
+      "contactNameRequired": "Vui lòng nhập tên liên hệ",
+      "contactNameMin": "Tên liên hệ phải có ít nhất 2 ký tự",
+      "contactNameMax": "Tên liên hệ không được quá 50 ký tự",
+      "contactPhoneRequired": "Vui lòng nhập số điện thoại liên hệ",
+      "contactPhoneInvalid": "Số điện thoại chỉ được chứa số",
+      "contactPhoneMin": "Số điện thoại phải có ít nhất 8 số",
+      "contactPhoneMax": "Số điện thoại không được quá 15 số",
+      "fileRequired": "File là bắt buộc",
+      "fileTypeInvalid": "Chỉ chấp nhận file ảnh và video",
+      "fileSizeInvalid": "Kích thước file không được quá 8MB",
+      "fileCountMax": "Tối đa 5 file",
+      "totalSizeMax": "Tổng dung lượng không được quá 8MB",
+      "videoCountMax": "Chỉ được upload tối đa 1 video"
+    },
+    "findRoom": {
+      "validation": {
+        "titleRequired": "Vui lòng nhập tiêu đề",
+        "titleMax": "Tiêu đề không được quá 150 ký tự",
+        "descriptionRequired": "Vui lòng nhập mô tả",
+        "descriptionMax": "Mô tả không được quá 5000 ký tự"
+      }
+    }
+  },
   "navigation": {
     "home": "Trang chủ",
     "about": "Giới thiệu",
@@ -89,6 +211,33 @@
     "profile": "Hồ sơ",
     "settings": "Cài đặt",
     "logout": "Đăng xuất"
+  },
+  "profile": {
+    "tabs": {
+      "newsfeed": "Bảng tin",
+      "notifications": "Thông báo",
+      "changePassword": "Đổi mật khẩu",
+      "logout": "Đăng xuất"
+    },
+    "notifications": {
+      "title": "Thông báo",
+      "newCount": "Bạn có 99+ thông báo mới..."
+    },
+    "changePassword": {
+      "title": "Đổi mật khẩu",
+      "comingSoon": "Chức năng đổi mật khẩu sẽ được phát triển..."
+    },
+    "userInfo": {
+      "about": "About",
+      "editInfo": "Chỉnh sửa thông tin"
+    },
+    "characterCount": "ký tự",
+    "filters": {
+      "all": "Tất cả",
+      "active": "Đang hiển thị", 
+      "pending": "Chờ phê duyệt",
+      "expired": "Hết hạn"
+    }
   },
   "brand": {
     "name": "RoomMate"

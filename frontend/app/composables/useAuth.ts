@@ -1,4 +1,5 @@
-import type { LoginDto, RegisterDto, LoginResponseDto } from '~/types/auth'
+import type { LoginDto, RegisterDto, LoginResponseDto } from '~/types'
+import {clearLocalStorage, getLocalStorage, setLocalStorage} from "~/ultils/localStorage";
 
 export const useAuth = () => {
   const config = useRuntimeConfig()
@@ -17,12 +18,13 @@ export const useAuth = () => {
         credentials: 'include' // Important for HttpOnly cookies
       })
       
-      
-      // Set authenticated state after successful login
-      isAuthenticated.value = true
-      currentUser.value = response.data.user
-      
-      
+      if (response.data.user) {
+        // Set authenticated state after successful login
+        isAuthenticated.value = true
+        currentUser.value = response.data.user
+        setLocalStorage('userInfo', response.data.user)
+      }
+
       return response
     } catch (error: any) {
       console.error('Login error:', error);
@@ -93,7 +95,7 @@ export const useAuth = () => {
       })
     
   
-      return response.data.access_token
+      return response.access_token
     } catch (error) {
       console.error('Failed to get token:', error)
       return null
@@ -112,6 +114,7 @@ export const useAuth = () => {
       // Clear authentication state
       isAuthenticated.value = false
       currentUser.value = null
+      clearLocalStorage()
     } catch (error) {
       console.error('Failed to remove token:', error)
     }
@@ -130,6 +133,14 @@ export const useAuth = () => {
     return isAuthenticated.value
   }
 
+  // Cover case F5 - Khôi phục dữ liệu user từ localStorage (chỉ trên client)
+  if (process.client) {
+    const savedUser = getLocalStorage('userInfo')
+    if (savedUser && !currentUser.value) {
+      currentUser.value = savedUser
+      isAuthenticated.value = true
+    }
+  }
 
   return {
     login,

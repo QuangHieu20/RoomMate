@@ -82,6 +82,122 @@
       "registerError": "An error occurred, please try again!"
     }
   },
+  "post": {
+    "create": {
+      "title": "Create Post",
+      "subtitle": "Share your room information",
+      "tabs": {
+        "rentOut": "Rent Out",
+        "findRoom": "Find Room/Roommate"
+      },
+      "sections": {
+        "location": "Location",
+        "roomInfo": "Room Information",
+        "content": "Post Content",
+        "contact": "Contact Information",
+        "description": "Description Information",
+        "requirements": "Requirements"
+      },
+      "fields": {
+        "province": "Province/City",
+        "district": "District",
+        "ward": "Ward",
+        "address": "Exact Address",
+        "roomType": "Room Type",
+        "price": "Price",
+        "priceType": "Price Type",
+        "area": "Area",
+        "title": "Title",
+        "description": "Description",
+        "genderRequirement": "Gender Requirement",
+        "maxOccupants": "Max Occupants",
+        "availableFrom": "Available From",
+        "contactName": "Contact Name",
+        "contactPhone": "Contact Phone"
+      },
+      "placeholders": {
+        "selectProvince": "Select Province/City",
+        "selectDistrict": "Select District",
+        "selectWard": "Select Ward",
+        "enterAddress": "Enter exact address",
+        "enterPrice": "Enter rent price",
+        "enterArea": "Enter area",
+        "enterTitle": "Enter title",
+        "enterDescription": "Enter description",
+        "enterContactName": "Enter contact name",
+        "enterContactPhone": "Enter contact phone",
+        "selectRoomType": "Select room type",
+        "selectGender": "Select gender",
+        "search": "Search..."
+      },
+      "options": {
+        "roomTypes": {
+          "single_room": "Single Room",
+          "shared_room": "Shared Room",
+          "apartment": "Apartment",
+          "house": "House",
+          "studio": "Studio"
+        },
+        "priceTypes": {
+          "monthly": "Monthly",
+          "daily": "Daily",
+          "yearly": "Yearly"
+        },
+        "genderRequirements": {
+          "any": "Any",
+          "male": "Male",
+          "female": "Female"
+        }
+      },
+      "buttons": {
+        "submit": "Submit Post",
+        "submitLoading": "Processing...",
+        "reset": "Reset"
+      },
+      "messages": {
+        "createSuccess": "Post created successfully!",
+        "createError": "Error occurred while creating post",
+        "validationError": "Please check your information"
+      }
+    },
+    "validation": {
+      "provinceRequired": "Please select province/city",
+      "districtRequired": "Please select district",
+      "wardRequired": "Please select ward",
+      "addressRequired": "Please enter exact address",
+      "addressMin": "Address must be at least 10 characters",
+      "addressMax": "Address must not exceed 200 characters",
+      "roomTypeRequired": "Please select room type",
+      "priceRequired": "Please enter rent price",
+      "priceMin": "Rent price must be from 100,000 VND",
+      "priceMax": "Rent price must not exceed 50,000,000 VND",
+      "priceTypeRequired": "Please select price type",
+      "areaRequired": "Please enter area",
+      "areaMin": "Area must be from 5m²",
+      "areaMax": "Area must not exceed 500m²",
+      "titleRequired": "Please enter title",
+      "titleMin": "Title must be at least 10 characters",
+      "titleMax": "Title must not exceed 150 characters",
+      "descriptionRequired": "Please enter description",
+      "descriptionMin": "Description must be at least 20 characters",
+      "descriptionMax": "Description must not exceed 5000 characters",
+      "contactNameRequired": "Please enter contact name",
+      "contactNameMin": "Contact name must be at least 2 characters",
+      "contactNameMax": "Contact name must not exceed 50 characters",
+      "contactPhoneRequired": "Please enter contact phone number",
+      "contactPhoneInvalid": "Phone number must contain only numbers",
+      "contactPhoneMin": "Phone number must be at least 8 digits",
+      "contactPhoneMax": "Phone number must not exceed 15 digits"
+    },
+    "findRoom": {
+      "validation": {
+        "titleRequired": "Please enter title",
+        "titleMax": "Title must not exceed 150 characters",
+        "descriptionRequired": "Please enter description",
+        "descriptionMax": "Description must not exceed 5000 characters"
+      }
+    }
+  },
   "navigation": {
     "home": "Home",
     "about": "About",
@@ -89,6 +205,33 @@
     "profile": "Profile",
     "settings": "Settings",
     "logout": "Logout"
+  },
+  "profile": {
+    "tabs": {
+      "newsfeed": "Newsfeed",
+      "notifications": "Notifications",
+      "changePassword": "Change Password",
+      "logout": "Logout"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "newCount": "You have 99+ new notifications..."
+    },
+    "changePassword": {
+      "title": "Change Password",
+      "comingSoon": "Password change feature will be developed..."
+    },
+    "userInfo": {
+      "about": "About",
+      "editInfo": "Edit Information"
+    },
+    "characterCount": "characters",
+    "filters": {
+      "all": "All",
+      "active": "Active",
+      "pending": "Pending",
+      "expired": "Expired"
+    }
   },
   "brand": {
     "name": "RoomMate"
