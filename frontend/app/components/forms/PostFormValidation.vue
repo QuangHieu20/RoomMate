@@ -113,7 +113,6 @@ const handleSubmit = async (values: any) => {
   loading.value = true
   
   try {
-    console.log('Form values:', values)
     
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000))
