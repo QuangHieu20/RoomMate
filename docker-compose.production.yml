@@ -11,9 +11,12 @@ services:
       args:
         BUILDKIT_INLINE_CACHE: 1
     container_name: 'roommate_be_prod'
-    restart: always
+    restart: unless-stopped
     ports:
       - '3000:3000'
+    volumes:
+      # Mount uploads directory để persist data
+      - /home/hieunq/roommate_uploads:/app/uploads:rw
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -37,6 +40,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
     command: >
       sh -c "
         echo '🚀 Starting RoomMate Backend...' &&
@@ -69,7 +80,15 @@ services:
       - roommate-network
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
 
   postgres:
     image: postgres:15-alpine
@@ -99,13 +118,24 @@ services:
     volumes:
       - ./.docker/production/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - /home/hieunq/roommate_cache/nginx:/var/cache/nginx:rw
+      - /home/hieunq/roommate_uploads:/var/www/uploads:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/lib/letsencrypt:/var/lib/letsencrypt:ro
     depends_on:
-      - frontend
-      - backend
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
     networks:
       - roommate-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
 
 volumes:
   postgres_data:
