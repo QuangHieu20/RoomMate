@@ -16,6 +16,41 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
+      - name: 🔐 Setup Environment Variables for Build Test
+        run: |
+          echo "🔐 Setting up environment variables for build test..."
+          
+          # Create .env file using GitHub Secrets
+          cat > .env << EOF
+          # Database Configuration from GitHub Secrets
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+
+          # Backend Configuration
+          NODE_ENV=production
+          PORT=3000
+          DATABASE_HOST=postgres
+          DATABASE_PORT=5432
+          DATABASE_NAME=${{ secrets.POSTGRES_DB }}
+          DATABASE_USER=${{ secrets.POSTGRES_USER }}
+          DATABASE_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+          API_BASE_URL=${{ secrets.API_BASE_URL }}
+          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+          API_PORT=3000
+          API_HOST=0.0.0.0
+
+          # Frontend Configuration
+          NUXT_PUBLIC_API_BASE=${{ secrets.NUXT_PUBLIC_API_BASE }}
+          NUXT_PUBLIC_FRONTEND_URL=${{ secrets.NUXT_PUBLIC_FRONTEND_URL }}
+          NUXT_PUBLIC_APP_NAME=${{ secrets.NUXT_PUBLIC_APP_NAME }}
+          NUXT_PUBLIC_MEDIA_BASE=${{ secrets.NUXT_PUBLIC_MEDIA_BASE }}
+          EOF
+
       - name: 🧹 Clean Docker Cache
         run: |
           echo "🧹 Cleaning Docker cache before build test..."
@@ -24,11 +59,11 @@ jobs:
 
       - name: 🏗️ Test Build Backend
         run: |
-          docker compose -f docker-compose.production.yml build --no-cache backend
+          docker-compose -f docker-compose.production.yml build --no-cache backend
 
       - name: 🏗️ Test Build Frontend
         run: |
-          docker compose -f docker-compose.production.yml build --no-cache frontend
+          docker-compose -f docker-compose.production.yml build --no-cache frontend
 
       - name: 🔧 Fix ownership after Docker builds
         run: |
@@ -82,6 +117,7 @@ jobs:
           NUXT_PUBLIC_API_BASE=${{ secrets.NUXT_PUBLIC_API_BASE }}
           NUXT_PUBLIC_FRONTEND_URL=${{ secrets.NUXT_PUBLIC_FRONTEND_URL }}
           NUXT_PUBLIC_APP_NAME=${{ secrets.NUXT_PUBLIC_APP_NAME }}
+          NUXT_PUBLIC_MEDIA_BASE=${{ secrets.NUXT_PUBLIC_MEDIA_BASE }}
           EOF
 
       - name: 🚀 Zero Downtime Deploy to Production
@@ -100,13 +136,13 @@ jobs:
           cp docker-compose.production.yml "$backup_path/" || true
           cp .env "$backup_path/" || true
           cp ./.docker/production/nginx/nginx.conf "$backup_path/" || true
-          docker compose -f docker-compose.production.yml images > "$backup_path/images.txt" || true
+          docker-compose -f docker-compose.production.yml images > "$backup_path/images.txt" || true
 
           # Pre-deployment health check
           echo "🏥 Pre-deployment health check..."
-          if docker compose -f docker-compose.production.yml ps | grep -q "Up"; then
+          if docker-compose -f docker-compose.production.yml ps | grep -q "Up"; then
             echo "📊 Current services status:"
-            docker compose -f docker-compose.production.yml ps
+            docker-compose -f docker-compose.production.yml ps
           fi
 
           # Clean up old images and cache before building
@@ -116,25 +152,25 @@ jobs:
           
           # Build new images without cache (fresh build)
           echo "🔨 Building new images without cache..."
-          docker compose -f docker-compose.production.yml build --no-cache --parallel
+          docker-compose -f docker-compose.production.yml build --no-cache --parallel
 
           # Zero downtime rolling update
           echo "🔄 Starting zero downtime rolling update..."
 
           # Update postgres first (if needed)
           echo "📊 Updating postgres..."
-          docker compose -f docker-compose.production.yml up -d --no-deps postgres
+          docker-compose -f docker-compose.production.yml up -d --no-deps postgres
           sleep 10
 
           # Update backend with health check
           echo "🔧 Updating backend..."
-          docker compose -f docker-compose.production.yml up -d --no-deps backend
+          docker-compose -f docker-compose.production.yml up -d --no-deps backend
           
           # Wait for backend to be healthy
           echo "🏥 Waiting for backend to be healthy..."
           backend_healthy=false
           for i in {1..30}; do
-            if docker compose -f docker-compose.production.yml ps backend | grep -q "healthy"; then
+            if docker-compose -f docker-compose.production.yml ps backend | grep -q "healthy"; then
               echo "✅ Backend is healthy"
               backend_healthy=true
               break
@@ -148,19 +184,19 @@ jobs:
             echo "🔄 Rolling back..."
             cp "$backup_path/docker-compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
-            docker compose -f docker-compose.production.yml up -d
+            docker-compose -f docker-compose.production.yml up -d
             exit 1
           fi
 
           # Update frontend
           echo "🎨 Updating frontend..."
-          docker compose -f docker-compose.production.yml up -d --no-deps frontend
+          docker-compose -f docker-compose.production.yml up -d --no-deps frontend
           
           # Wait for frontend to be healthy
           echo "🏥 Waiting for frontend to be healthy..."
           frontend_healthy=false
           for i in {1..20}; do
-            if docker compose -f docker-compose.production.yml ps frontend | grep -q "healthy"; then
+            if docker-compose -f docker-compose.production.yml ps frontend | grep -q "healthy"; then
               echo "✅ Frontend is healthy"
               frontend_healthy=true
               break
@@ -174,19 +210,19 @@ jobs:
             echo "🔄 Rolling back..."
             cp "$backup_path/docker-compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
-            docker compose -f docker-compose.production.yml up -d
+            docker-compose -f docker-compose.production.yml up -d
             exit 1
           fi
 
           # Update nginx last (entry point)
           echo "🌐 Updating nginx..."
-          docker compose -f docker-compose.production.yml up -d --no-deps nginx
+          docker-compose -f docker-compose.production.yml up -d --no-deps nginx
           
           # Wait for nginx to be healthy
           echo "🏥 Waiting for nginx to be healthy..."
           nginx_healthy=false
           for i in {1..20}; do
-            if docker compose -f docker-compose.production.yml ps nginx | grep -q "healthy"; then
+            if docker-compose -f docker-compose.production.yml ps nginx | grep -q "healthy"; then
               echo "✅ Nginx is healthy"
               nginx_healthy=true
               break
@@ -200,7 +236,7 @@ jobs:
             echo "🔄 Rolling back..."
             cp "$backup_path/docker-compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
-            docker compose -f docker-compose.production.yml up -d
+            docker-compose -f docker-compose.production.yml up -d
             exit 1
           fi
 
@@ -214,13 +250,13 @@ jobs:
           sleep 30
           
           # Check all services are running
-          if ! docker compose -f docker-compose.production.yml ps | grep -q "Up"; then
+          if ! docker-compose -f docker-compose.production.yml ps | grep -q "Up"; then
             echo "❌ Some services are not running after deployment"
             echo "🔄 Rolling back to previous version..."
             cp "$backup_path/docker-compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
             cp "$backup_path/nginx.conf" ./.docker/production/nginx/ || true
-            docker compose -f docker-compose.production.yml up -d
+            docker-compose -f docker-compose.production.yml up -d
             exit 1
           fi
 
@@ -247,4 +283,4 @@ jobs:
           echo "🌐 Backend API: https://roommate.id.vn/api"
           echo "🏥 Health Check: https://roommate.id.vn/health"
           echo "📊 Final services status:"
-          docker compose -f docker-compose.production.yml ps
+          docker-compose -f docker-compose.production.yml ps
