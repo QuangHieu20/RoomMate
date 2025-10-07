@@ -121,24 +121,77 @@ jobs:
           
           # Wait for backend to be healthy
           echo "🏥 Waiting for backend to be healthy..."
+          backend_healthy=false
           for i in {1..30}; do
-            if curl -f -s http://localhost:3000/health > /dev/null 2>&1; then
+            if docker-compose -f docker-compose.production.yml ps backend | grep -q "healthy"; then
               echo "✅ Backend is healthy"
+              backend_healthy=true
               break
             fi
             echo "Attempt $i/30: Backend not ready yet..."
             sleep 10
           done
+          
+          if [ "$backend_healthy" = false ]; then
+            echo "❌ Backend failed to become healthy"
+            echo "🔄 Rolling back..."
+            cp "$backup_path/docker-compose.production.yml" ./ || true
+            cp "$backup_path/.env" ./ || true
+            docker-compose -f docker-compose.production.yml up -d
+            exit 1
+          fi
 
           # Update frontend
           echo "🎨 Updating frontend..."
           docker-compose -f docker-compose.production.yml up -d --no-deps frontend
-          sleep 10
+          
+          # Wait for frontend to be healthy
+          echo "🏥 Waiting for frontend to be healthy..."
+          frontend_healthy=false
+          for i in {1..20}; do
+            if docker-compose -f docker-compose.production.yml ps frontend | grep -q "healthy"; then
+              echo "✅ Frontend is healthy"
+              frontend_healthy=true
+              break
+            fi
+            echo "Attempt $i/20: Frontend not ready yet..."
+            sleep 5
+          done
+          
+          if [ "$frontend_healthy" = false ]; then
+            echo "❌ Frontend failed to become healthy"
+            echo "🔄 Rolling back..."
+            cp "$backup_path/docker-compose.production.yml" ./ || true
+            cp "$backup_path/.env" ./ || true
+            docker-compose -f docker-compose.production.yml up -d
+            exit 1
+          fi
 
-          # Update nginx last
+          # Update nginx last (entry point)
           echo "🌐 Updating nginx..."
           docker-compose -f docker-compose.production.yml up -d --no-deps nginx
-          sleep 10
+          
+          # Wait for nginx to be healthy
+          echo "🏥 Waiting for nginx to be healthy..."
+          nginx_healthy=false
+          for i in {1..20}; do
+            if docker-compose -f docker-compose.production.yml ps nginx | grep -q "healthy"; then
+              echo "✅ Nginx is healthy"
+              nginx_healthy=true
+              break
+            fi
+            echo "Attempt $i/20: Nginx not ready yet..."
+            sleep 5
+          done
+          
+          if [ "$nginx_healthy" = false ]; then
+            echo "❌ Nginx failed to become healthy"
+            echo "🔄 Rolling back..."
+            cp "$backup_path/docker-compose.production.yml" ./ || true
+            cp "$backup_path/.env" ./ || true
+            docker-compose -f docker-compose.production.yml up -d
+            exit 1
+          fi
 
           # Fix ownership after Docker operations
           echo "🔧 Fixing ownership after Docker operations..."
