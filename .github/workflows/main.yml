@@ -51,11 +51,11 @@ jobs:
           NUXT_PUBLIC_MEDIA_BASE=${{ secrets.NUXT_PUBLIC_MEDIA_BASE }}
           EOF
 
-      - name: 🧹 Clean Docker Cache
+      - name: 🧹 Light Clean for Build Test
         run: |
-          echo "🧹 Cleaning Docker cache before build test..."
-          docker system prune -f || true
-          docker builder prune -f || true
+          echo "🧹 Light cleaning for build test (keeping containers)..."
+          # Only clean unused images, keep containers running
+          docker image prune -f || true
 
       - name: 🏗️ Test Build Backend
         run: |
@@ -133,7 +133,7 @@ jobs:
 
           # Backup current deployment
           echo "💾 Backing up current deployment..."
-          cp docker compose.production.yml "$backup_path/" || true
+          cp docker-compose.production.yml "$backup_path/" || true
           cp .env "$backup_path/" || true
           cp ./.docker/production/nginx/nginx.conf "$backup_path/" || true
           docker compose -f docker-compose.production.yml images > "$backup_path/images.txt" || true
@@ -145,10 +145,12 @@ jobs:
             docker compose -f docker-compose.production.yml ps
           fi
 
-          # Clean up old images and cache before building
-          echo "🧹 Cleaning up old images and cache..."
-          docker system prune -f || true
-          docker builder prune -f || true
+          # Smart cleanup - only clean unused images, keep running containers
+          echo "🧹 Smart cleanup (keeping running containers)..."
+          docker image prune -f || true
+          
+          # Only remove stopped containers, not running ones
+          docker container prune -f || true
           
           # Build new images without cache (fresh build)
           echo "🔨 Building new images without cache..."
@@ -182,7 +184,7 @@ jobs:
           if [ "$backend_healthy" = false ]; then
             echo "❌ Backend failed to become healthy"
             echo "🔄 Rolling back..."
-            cp "$backup_path/docker compose.production.yml" ./ || true
+            cp "$backup_path/docker-compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
             docker compose -f docker-compose.production.yml up -d
             exit 1
@@ -208,7 +210,7 @@ jobs:
           if [ "$frontend_healthy" = false ]; then
             echo "❌ Frontend failed to become healthy"
             echo "🔄 Rolling back..."
-            cp "$backup_path/docker compose.production.yml" ./ || true
+            cp "$backup_path/docker-compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
             docker compose -f docker-compose.production.yml up -d
             exit 1
@@ -234,7 +236,7 @@ jobs:
           if [ "$nginx_healthy" = false ]; then
             echo "❌ Nginx failed to become healthy"
             echo "🔄 Rolling back..."
-            cp "$backup_path/docker compose.production.yml" ./ || true
+            cp "$backup_path/docker-compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
             docker compose -f docker-compose.production.yml up -d
             exit 1
@@ -253,7 +255,7 @@ jobs:
           if ! docker compose -f docker-compose.production.yml ps | grep -q "Up"; then
             echo "❌ Some services are not running after deployment"
             echo "🔄 Rolling back to previous version..."
-            cp "$backup_path/docker compose.production.yml" ./ || true
+            cp "$backup_path/docker-compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
             cp "$backup_path/nginx.conf" ./.docker/production/nginx/ || true
             docker compose -f docker-compose.production.yml up -d
