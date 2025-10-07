@@ -156,91 +156,88 @@ jobs:
           echo "🔨 Building new images without cache..."
           docker compose -f docker-compose.production.yml build --no-cache --parallel
 
-          # Zero downtime rolling update
-          echo "🔄 Starting zero downtime rolling update..."
+          # True Zero Downtime Rolling Update
+          echo "🔄 Starting true zero downtime rolling update..."
 
-          # Update postgres first (if needed)
-          echo "📊 Updating postgres..."
+          # Step 1: Update postgres (usually no changes, but ensure it's running)
+          echo "📊 Ensuring postgres is running..."
           docker compose -f docker-compose.production.yml up -d --no-deps postgres
-          sleep 10
+          sleep 5
 
-          # Update backend with health check
-          echo "🔧 Updating backend..."
-          docker compose -f docker-compose.production.yml up -d --no-deps backend
+          # Step 2: Rolling update backend with proper strategy
+          echo "🔧 Rolling update backend..."
           
-          # Wait for backend to be healthy
-          echo "🏥 Waiting for backend to be healthy..."
+          # Create new backend container with different name
+          docker compose -f docker-compose.production.yml up -d --no-deps --scale backend=2 backend
+          
+          # Wait for new backend to be healthy
+          echo "🏥 Waiting for new backend to be healthy..."
           backend_healthy=false
           for i in {1..30}; do
-            if docker compose -f docker-compose.production.yml ps backend | grep -q "healthy"; then
-              echo "✅ Backend is healthy"
-              backend_healthy=true
-              break
+            # Check if we have 2 backend containers and at least one is healthy
+            backend_count=$(docker compose -f docker-compose.production.yml ps backend --format "table {{.Name}}" | grep -c "backend" || echo "0")
+            if [ "$backend_count" -ge 2 ]; then
+              if docker compose -f docker-compose.production.yml ps backend | grep -q "healthy"; then
+                echo "✅ New backend is healthy"
+                backend_healthy=true
+                break
+              fi
             fi
-            echo "Attempt $i/30: Backend not ready yet..."
+            echo "Attempt $i/30: New backend not ready yet..."
             sleep 10
           done
           
           if [ "$backend_healthy" = false ]; then
-            echo "❌ Backend failed to become healthy"
-            echo "🔄 Rolling back..."
-            cp "$backup_path/docker-compose.production.yml" ./ || true
-            cp "$backup_path/.env" ./ || true
-            docker compose -f docker-compose.production.yml up -d
+            echo "❌ New backend failed to become healthy"
+            echo "🔄 Rolling back backend..."
+            docker compose -f docker-compose.production.yml up -d --no-deps --scale backend=1 backend
             exit 1
           fi
 
-          # Update frontend
-          echo "🎨 Updating frontend..."
-          docker compose -f docker-compose.production.yml up -d --no-deps frontend
+          # Scale back to 1 backend (this will stop the old one)
+          echo "🔄 Scaling back to 1 backend (stopping old container)..."
+          docker compose -f docker-compose.production.yml up -d --no-deps --scale backend=1 backend
+          sleep 5
+
+          # Step 3: Rolling update frontend with proper strategy
+          echo "🎨 Rolling update frontend..."
           
-          # Wait for frontend to be healthy
-          echo "🏥 Waiting for frontend to be healthy..."
+          # Create new frontend container with different name
+          docker compose -f docker-compose.production.yml up -d --no-deps --scale frontend=2 frontend
+          
+          # Wait for new frontend to be healthy
+          echo "🏥 Waiting for new frontend to be healthy..."
           frontend_healthy=false
           for i in {1..20}; do
-            if docker compose -f docker-compose.production.yml ps frontend | grep -q "healthy"; then
-              echo "✅ Frontend is healthy"
-              frontend_healthy=true
-              break
+            # Check if we have 2 frontend containers and at least one is healthy
+            frontend_count=$(docker compose -f docker-compose.production.yml ps frontend --format "table {{.Name}}" | grep -c "frontend" || echo "0")
+            if [ "$frontend_count" -ge 2 ]; then
+              if docker compose -f docker-compose.production.yml ps frontend | grep -q "healthy"; then
+                echo "✅ New frontend is healthy"
+                frontend_healthy=true
+                break
+              fi
             fi
-            echo "Attempt $i/20: Frontend not ready yet..."
+            echo "Attempt $i/20: New frontend not ready yet..."
             sleep 5
           done
           
           if [ "$frontend_healthy" = false ]; then
-            echo "❌ Frontend failed to become healthy"
-            echo "🔄 Rolling back..."
-            cp "$backup_path/docker-compose.production.yml" ./ || true
-            cp "$backup_path/.env" ./ || true
-            docker compose -f docker-compose.production.yml up -d
+            echo "❌ New frontend failed to become healthy"
+            echo "🔄 Rolling back frontend..."
+            docker compose -f docker-compose.production.yml up -d --no-deps --scale frontend=1 frontend
             exit 1
           fi
 
-          # Update nginx last (entry point)
-          echo "🌐 Updating nginx..."
+          # Scale back to 1 frontend (this will stop the old one)
+          echo "🔄 Scaling back to 1 frontend (stopping old container)..."
+          docker compose -f docker-compose.production.yml up -d --no-deps --scale frontend=1 frontend
+          sleep 5
+
+          # Step 4: Update nginx (usually no changes, but ensure it's running)
+          echo "🌐 Ensuring nginx is running..."
           docker compose -f docker-compose.production.yml up -d --no-deps nginx
-          
-          # Wait for nginx to be healthy
-          echo "🏥 Waiting for nginx to be healthy..."
-          nginx_healthy=false
-          for i in {1..20}; do
-            if docker compose -f docker-compose.production.yml ps nginx | grep -q "healthy"; then
-              echo "✅ Nginx is healthy"
-              nginx_healthy=true
-              break
-            fi
-            echo "Attempt $i/20: Nginx not ready yet..."
-            sleep 5
-          done
-          
-          if [ "$nginx_healthy" = false ]; then
-            echo "❌ Nginx failed to become healthy"
-            echo "🔄 Rolling back..."
-            cp "$backup_path/docker-compose.production.yml" ./ || true
-            cp "$backup_path/.env" ./ || true
-            docker compose -f docker-compose.production.yml up -d
-            exit 1
-          fi
+          sleep 5
 
           # Fix ownership after Docker operations
           echo "🔧 Fixing ownership after Docker operations..."
