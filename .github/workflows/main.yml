@@ -16,6 +16,41 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
+      - name: 🔐 Setup Environment Variables for Build Test
+        run: |
+          echo "🔐 Setting up environment variables for build test..."
+          
+          # Create .env file using GitHub Secrets
+          cat > .env << EOF
+          # Database Configuration from GitHub Secrets
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+
+          # Backend Configuration
+          NODE_ENV=production
+          PORT=3000
+          DATABASE_HOST=postgres
+          DATABASE_PORT=5432
+          DATABASE_NAME=${{ secrets.POSTGRES_DB }}
+          DATABASE_USER=${{ secrets.POSTGRES_USER }}
+          DATABASE_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+          API_BASE_URL=${{ secrets.API_BASE_URL }}
+          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+          API_PORT=3000
+          API_HOST=0.0.0.0
+
+          # Frontend Configuration
+          NUXT_PUBLIC_API_BASE=${{ secrets.NUXT_PUBLIC_API_BASE }}
+          NUXT_PUBLIC_FRONTEND_URL=${{ secrets.NUXT_PUBLIC_FRONTEND_URL }}
+          NUXT_PUBLIC_APP_NAME=${{ secrets.NUXT_PUBLIC_APP_NAME }}
+          NUXT_PUBLIC_MEDIA_BASE=${{ secrets.NUXT_PUBLIC_MEDIA_BASE }}
+          EOF
+
       - name: 🧹 Clean Docker Cache
         run: |
           echo "🧹 Cleaning Docker cache before build test..."
@@ -82,6 +117,7 @@ jobs:
           NUXT_PUBLIC_API_BASE=${{ secrets.NUXT_PUBLIC_API_BASE }}
           NUXT_PUBLIC_FRONTEND_URL=${{ secrets.NUXT_PUBLIC_FRONTEND_URL }}
           NUXT_PUBLIC_APP_NAME=${{ secrets.NUXT_PUBLIC_APP_NAME }}
+          NUXT_PUBLIC_MEDIA_BASE=${{ secrets.NUXT_PUBLIC_MEDIA_BASE }}
           EOF
 
       - name: 🚀 Zero Downtime Deploy to Production
@@ -97,7 +133,7 @@ jobs:
 
           # Backup current deployment
           echo "💾 Backing up current deployment..."
-          cp docker-compose.production.yml "$backup_path/" || true
+          cp docker compose.production.yml "$backup_path/" || true
           cp .env "$backup_path/" || true
           cp ./.docker/production/nginx/nginx.conf "$backup_path/" || true
           docker compose -f docker-compose.production.yml images > "$backup_path/images.txt" || true
@@ -146,7 +182,7 @@ jobs:
           if [ "$backend_healthy" = false ]; then
             echo "❌ Backend failed to become healthy"
             echo "🔄 Rolling back..."
-            cp "$backup_path/docker-compose.production.yml" ./ || true
+            cp "$backup_path/docker compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
             docker compose -f docker-compose.production.yml up -d
             exit 1
@@ -172,7 +208,7 @@ jobs:
           if [ "$frontend_healthy" = false ]; then
             echo "❌ Frontend failed to become healthy"
             echo "🔄 Rolling back..."
-            cp "$backup_path/docker-compose.production.yml" ./ || true
+            cp "$backup_path/docker compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
             docker compose -f docker-compose.production.yml up -d
             exit 1
@@ -198,7 +234,7 @@ jobs:
           if [ "$nginx_healthy" = false ]; then
             echo "❌ Nginx failed to become healthy"
             echo "🔄 Rolling back..."
-            cp "$backup_path/docker-compose.production.yml" ./ || true
+            cp "$backup_path/docker compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
             docker compose -f docker-compose.production.yml up -d
             exit 1
@@ -217,7 +253,7 @@ jobs:
           if ! docker compose -f docker-compose.production.yml ps | grep -q "Up"; then
             echo "❌ Some services are not running after deployment"
             echo "🔄 Rolling back to previous version..."
-            cp "$backup_path/docker-compose.production.yml" ./ || true
+            cp "$backup_path/docker compose.production.yml" ./ || true
             cp "$backup_path/.env" ./ || true
             cp "$backup_path/nginx.conf" ./.docker/production/nginx/ || true
             docker compose -f docker-compose.production.yml up -d
