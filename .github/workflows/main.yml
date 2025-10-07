@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -16,9 +16,9 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔐 Setup Environment Variables for Build Test
+      - name: 🔐 Create Environment File
         run: |
-          echo "🔐 Setting up environment variables for build test..."
+          echo "🔐 Creating environment file from GitHub Secrets..."
           
           # Create .env file using GitHub Secrets
           cat > .env << EOF
@@ -51,19 +51,22 @@ jobs:
           NUXT_PUBLIC_MEDIA_BASE=${{ secrets.NUXT_PUBLIC_MEDIA_BASE }}
           EOF
 
+      - name: 📦 Upload Environment File Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: env-file
+          path: .env
+          retention-days: 1
+
       - name: 🧹 Light Clean for Build Test
         run: |
           echo "🧹 Light cleaning for build test (keeping containers)..."
           # Only clean unused images, keep containers running
           docker image prune -f || true
 
-      - name: 🏗️ Test Build Backend
+      - name: 🏗️ Test Build Services
         run: |
-          docker compose -f docker-compose.production.yml build --no-cache backend
-
-      - name: 🏗️ Test Build Frontend
-        run: |
-          docker compose -f docker-compose.production.yml build --no-cache frontend
+          docker compose -f docker-compose.production.yml build --no-cache backend frontend
 
       - name: 🔧 Fix ownership after Docker builds
         run: |
@@ -85,40 +88,24 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🔐 Setup Environment Variables from GitHub Secrets
+      - name: 📦 Download Environment File Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: env-file
+          path: .
+
+      - name: 🔐 Verify Environment File
         run: |
-          echo "🔐 Setting up environment variables from GitHub secrets..."
-
-          # Create .env file from GitHub secrets
-          cat > .env << EOF
-          # Database Configuration from GitHub Secrets
-          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-
-          # Backend Configuration
-          NODE_ENV=production
-          PORT=3000
-          DATABASE_HOST=postgres
-          DATABASE_PORT=5432
-          DATABASE_NAME=${{ secrets.POSTGRES_DB }}
-          DATABASE_USER=${{ secrets.POSTGRES_USER }}
-          DATABASE_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
-          DATABASE_URL=${{ secrets.DATABASE_URL }}
-          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
-          API_BASE_URL=${{ secrets.API_BASE_URL }}
-          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
-          JWT_SECRET=${{ secrets.JWT_SECRET }}
-          JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
-          API_PORT=${{ secrets.API_PORT }}
-          API_HOST=${{ secrets.API_HOST }}
-
-          # Frontend Configuration
-          NUXT_PUBLIC_API_BASE=${{ secrets.NUXT_PUBLIC_API_BASE }}
-          NUXT_PUBLIC_FRONTEND_URL=${{ secrets.NUXT_PUBLIC_FRONTEND_URL }}
-          NUXT_PUBLIC_APP_NAME=${{ secrets.NUXT_PUBLIC_APP_NAME }}
-          NUXT_PUBLIC_MEDIA_BASE=${{ secrets.NUXT_PUBLIC_MEDIA_BASE }}
-          EOF
+          echo "🔐 Verifying environment file..."
+          if [ -f .env ]; then
+            echo "✅ Environment file downloaded successfully"
+            echo "📋 Environment variables:"
+            grep -E "^[A-Z]" .env | head -5
+            echo "..."
+          else
+            echo "❌ Environment file not found"
+            exit 1
+          fi
 
       - name: 🚀 Zero Downtime Deploy to Production
         run: |
@@ -154,7 +141,7 @@ jobs:
           
           # Build new images without cache (fresh build)
           echo "🔨 Building new images without cache..."
-          docker compose -f docker-compose.production.yml build --no-cache --parallel
+          docker compose -f docker-compose.production.yml build --no-cache --parallel backend frontend
 
           # True Zero Downtime Rolling Update
           echo "🔄 Starting true zero downtime rolling update..."
@@ -164,79 +151,93 @@ jobs:
           docker compose -f docker-compose.production.yml up -d --no-deps postgres
           sleep 5
 
-          # Step 2: Rolling update backend with proper strategy
-          echo "🔧 Rolling update backend..."
+          # Step 2: Rolling update backend using scaling
+          echo "🔧 Rolling update backend using scaling strategy..."
           
-          # Create new backend container with different name
+          # Scale backend to 2 containers (creates new container alongside old one)
           docker compose -f docker-compose.production.yml up -d --no-deps --scale backend=2 backend
           
-          # Wait for new backend to be healthy
-          echo "🏥 Waiting for new backend to be healthy..."
+          # Wait for new backend container to be healthy
+          echo "🏥 Waiting for new backend container to be healthy..."
           backend_healthy=false
           for i in {1..30}; do
             # Check if we have 2 backend containers and at least one is healthy
             backend_count=$(docker compose -f docker-compose.production.yml ps backend --format "table {{.Name}}" | grep -c "backend" || echo "0")
             if [ "$backend_count" -ge 2 ]; then
               if docker compose -f docker-compose.production.yml ps backend | grep -q "healthy"; then
-                echo "✅ New backend is healthy"
+                echo "✅ New backend container is healthy"
                 backend_healthy=true
                 break
               fi
             fi
-            echo "Attempt $i/30: New backend not ready yet..."
+            echo "Attempt $i/30: New backend container not ready yet..."
             sleep 10
           done
           
           if [ "$backend_healthy" = false ]; then
-            echo "❌ New backend failed to become healthy"
+            echo "❌ New backend container failed to become healthy"
             echo "🔄 Rolling back backend..."
             docker compose -f docker-compose.production.yml up -d --no-deps --scale backend=1 backend
             exit 1
           fi
 
-          # Scale back to 1 backend (this will stop the old one)
+          # Scale back to 1 backend (this will stop the old container)
           echo "🔄 Scaling back to 1 backend (stopping old container)..."
           docker compose -f docker-compose.production.yml up -d --no-deps --scale backend=1 backend
           sleep 5
-
-          # Step 3: Rolling update frontend with proper strategy
-          echo "🎨 Rolling update frontend..."
           
-          # Create new frontend container with different name
+          # Clean up old backend containers to avoid port conflicts
+          echo "🧹 Cleaning up old backend containers..."
+          docker compose -f docker-compose.production.yml rm -f backend || true
+          sleep 2
+
+          # Step 3: Rolling update frontend using scaling
+          echo "🎨 Rolling update frontend using scaling strategy..."
+          
+          # Scale frontend to 2 containers (creates new container alongside old one)
           docker compose -f docker-compose.production.yml up -d --no-deps --scale frontend=2 frontend
           
-          # Wait for new frontend to be healthy
-          echo "🏥 Waiting for new frontend to be healthy..."
+          # Wait for new frontend container to be healthy
+          echo "🏥 Waiting for new frontend container to be healthy..."
           frontend_healthy=false
           for i in {1..20}; do
             # Check if we have 2 frontend containers and at least one is healthy
             frontend_count=$(docker compose -f docker-compose.production.yml ps frontend --format "table {{.Name}}" | grep -c "frontend" || echo "0")
             if [ "$frontend_count" -ge 2 ]; then
               if docker compose -f docker-compose.production.yml ps frontend | grep -q "healthy"; then
-                echo "✅ New frontend is healthy"
+                echo "✅ New frontend container is healthy"
                 frontend_healthy=true
                 break
               fi
             fi
-            echo "Attempt $i/20: New frontend not ready yet..."
+            echo "Attempt $i/20: New frontend container not ready yet..."
             sleep 5
           done
           
           if [ "$frontend_healthy" = false ]; then
-            echo "❌ New frontend failed to become healthy"
+            echo "❌ New frontend container failed to become healthy"
             echo "🔄 Rolling back frontend..."
             docker compose -f docker-compose.production.yml up -d --no-deps --scale frontend=1 frontend
             exit 1
           fi
 
-          # Scale back to 1 frontend (this will stop the old one)
+          # Scale back to 1 frontend (this will stop the old container)
           echo "🔄 Scaling back to 1 frontend (stopping old container)..."
           docker compose -f docker-compose.production.yml up -d --no-deps --scale frontend=1 frontend
           sleep 5
+          
+          # Clean up old frontend containers to avoid port conflicts
+          echo "🧹 Cleaning up old frontend containers..."
+          docker compose -f docker-compose.production.yml rm -f frontend || true
+          sleep 2
 
-          # Step 4: Update nginx (usually no changes, but ensure it's running)
-          echo "🌐 Ensuring nginx is running..."
+          # Step 4: Update nginx and reload configuration
+          echo "🌐 Updating nginx and reloading configuration..."
           docker compose -f docker-compose.production.yml up -d --no-deps nginx
+          
+          # Reload nginx configuration inside container
+          echo "🔄 Reloading nginx configuration..."
+          docker exec roommate_nginx_prod nginx -s reload || true
           sleep 5
 
           # Fix ownership after Docker operations
@@ -259,27 +260,53 @@ jobs:
             exit 1
           fi
 
-          # Test API endpoint
+          # Test API endpoints through nginx load balancer
+          echo "🏥 Testing API endpoints..."
+          api_healthy=true
+          
+          # Test through nginx load balancer
           if curl -f -s http://localhost/api/health > /dev/null; then
-            echo "✅ API health check passed"
+            echo "✅ API through nginx load balancer passed"
           else
-            echo "⚠️ API health check failed, but deployment may still be successful"
+            echo "⚠️ API through nginx load balancer failed"
+            api_healthy=false
           fi
 
-          # Test frontend
+          # Test frontend through nginx load balancer
+          echo "🏥 Testing frontend..."
+          frontend_healthy=true
+          
+          # Test through nginx load balancer
           if curl -f -s http://localhost > /dev/null; then
-            echo "✅ Frontend is accessible"
+            echo "✅ Frontend through nginx load balancer passed"
           else
-            echo "⚠️ Frontend test failed, but deployment may still be successful"
+            echo "⚠️ Frontend through nginx load balancer failed"
+            frontend_healthy=false
+          fi
+          
+          # Overall health check
+          if [ "$api_healthy" = true ] && [ "$frontend_healthy" = true ]; then
+            echo "✅ All health checks passed"
+          else
+            echo "⚠️ Some health checks failed, but deployment may still be successful"
           fi
 
           # Cleanup old images
           echo "🧹 Cleaning up old images..."
           docker image prune -f || true
+          
+          # Final cleanup - remove any stopped containers to avoid conflicts
+          echo "🧹 Final cleanup - removing stopped containers..."
+          docker container prune -f || true
 
           echo "✅ Zero Downtime Deployment completed successfully!"
           echo "🌐 Frontend: https://roommate.id.vn"
           echo "🌐 Backend API: https://roommate.id.vn/api"
           echo "🏥 Health Check: https://roommate.id.vn/health"
+          echo ""
+          echo "📊 Load Balancer Status:"
+          echo "Backend: http://localhost/api/health (load balanced)"
+          echo "Frontend: http://localhost (load balanced)"
+          echo ""
           echo "📊 Final services status:"
           docker compose -f docker-compose.production.yml ps
