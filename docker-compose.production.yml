@@ -46,6 +46,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
     command: >
       sh -c "
         echo '🚀 Starting RoomMate Backend...' &&
@@ -85,6 +87,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
 
   postgres:
     image: postgres:15-alpine
@@ -130,6 +134,8 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    stop_grace_period: 30s
+    stop_signal: SIGTERM
 
 volumes:
   postgres_data:
