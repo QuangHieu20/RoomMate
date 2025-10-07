@@ -51,12 +51,6 @@ jobs:
           NUXT_PUBLIC_MEDIA_BASE=${{ secrets.NUXT_PUBLIC_MEDIA_BASE }}
           EOF
 
-      - name: 📦 Upload Environment File Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: env-file
-          path: .env
-          retention-days: 1
 
       - name: 🧹 Light Clean for Build Test
         run: |
@@ -88,24 +82,43 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 📦 Download Environment File Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: env-file
-          path: .
-
-      - name: 🔐 Verify Environment File
+      - name: 🔐 Create Environment File from Secrets
         run: |
-          echo "🔐 Verifying environment file..."
-          if [ -f .env ]; then
-            echo "✅ Environment file downloaded successfully"
-            echo "📋 Environment variables:"
-            grep -E "^[A-Z]" .env | head -5
-            echo "..."
-          else
-            echo "❌ Environment file not found"
-            exit 1
-          fi
+          echo "🔐 Creating environment file from GitHub secrets..."
+          
+          # Create .env file from GitHub secrets
+          cat > .env << EOF
+          # Database Configuration from GitHub Secrets
+          POSTGRES_DB=${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER=${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+
+          # Backend Configuration
+          NODE_ENV=production
+          PORT=3000
+          DATABASE_HOST=postgres
+          DATABASE_PORT=5432
+          DATABASE_NAME=${{ secrets.POSTGRES_DB }}
+          DATABASE_USER=${{ secrets.POSTGRES_USER }}
+          DATABASE_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          FRONTEND_URL=${{ secrets.FRONTEND_URL }}
+          API_BASE_URL=${{ secrets.API_BASE_URL }}
+          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}
+          API_PORT=3000
+          API_HOST=0.0.0.0
+
+          # Frontend Configuration
+          NUXT_PUBLIC_API_BASE=${{ secrets.NUXT_PUBLIC_API_BASE }}
+          NUXT_PUBLIC_FRONTEND_URL=${{ secrets.NUXT_PUBLIC_FRONTEND_URL }}
+          NUXT_PUBLIC_APP_NAME=${{ secrets.NUXT_PUBLIC_APP_NAME }}
+          NUXT_PUBLIC_MEDIA_BASE=${{ secrets.NUXT_PUBLIC_MEDIA_BASE }}
+          EOF
+          
+          echo "✅ Environment file created successfully"
+          echo "📋 File size: $(wc -l < .env) lines"
 
       - name: 🚀 Zero Downtime Deploy to Production
         run: |
