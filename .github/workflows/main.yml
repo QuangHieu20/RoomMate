@@ -16,13 +16,19 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
+      - name: 🧹 Clean Docker Cache
+        run: |
+          echo "🧹 Cleaning Docker cache before build test..."
+          docker system prune -f || true
+          docker builder prune -f || true
+
       - name: 🏗️ Test Build Backend
         run: |
-          docker build -f .docker/production/backend/Dockerfile .
+          docker compose -f docker-compose.production.yml build --no-cache backend
 
       - name: 🏗️ Test Build Frontend
         run: |
-          docker build -f .docker/production/frontend/Dockerfile .
+          docker compose -f docker-compose.production.yml build --no-cache frontend
 
       - name: 🔧 Fix ownership after Docker builds
         run: |
@@ -103,9 +109,14 @@ jobs:
             docker compose -f docker-compose.production.yml ps
           fi
 
-          # Build new images with cache
-          echo "🔨 Building new images with cache..."
-          docker compose -f docker-compose.production.yml build --parallel
+          # Clean up old images and cache before building
+          echo "🧹 Cleaning up old images and cache..."
+          docker system prune -f || true
+          docker builder prune -f || true
+          
+          # Build new images without cache (fresh build)
+          echo "🔨 Building new images without cache..."
+          docker compose -f docker-compose.production.yml build --no-cache --parallel
 
           # Zero downtime rolling update
           echo "🔄 Starting zero downtime rolling update..."
