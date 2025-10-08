@@ -38,8 +38,8 @@ import {
   APP_CONSTANTS,
   DEFAULT_FORM_VALUES,
 } from '~/types/enums';
+const { getMediaUrl } = useApiUrl();
 
-// 3️⃣ CẤU HÌNH FILE META
 definePageMeta({
   layout: 'default',
   middleware: ['auth'],
@@ -189,11 +189,7 @@ const findRoomForm = reactive({
 const uploadedFiles = ref<File[]>([]);
 const previewUrls = ref<string[]>([]);
 const base64Files = ref<string[]>([]); // Store base64 strings
-const isUploading = ref(false);
 
-// Get validation schemas from composable
-const { findRoomSchema } = useValidationSchema();
-const findRoomValidationSchema = toTypedSchema(findRoomSchema.value);
 
 // Toast state
 const toast = reactive<ToastMessage & { show: boolean }>({
@@ -230,22 +226,16 @@ const switchTab = (tabName: ProfileTab) => {
   activeTab.value = tabName;
 };
 
-// Helper function to create profile URL with tab
-const createProfileUrl = (tab: ProfileTab, createTab?: CreatePostTab) => {
-  const params = new URLSearchParams();
-  params.set('tab', tab);
-  if (createTab) {
-    params.set('createTab', createTab);
-  }
-  return `/profile?${params.toString()}`;
-};
 
 // Load user profile
 const loadProfile = async () => {
   try {
-    form.fullName = userInfo.fullName;
-    form.email = userInfo.email;
-    form.phone = userInfo.phone;
+    const userInfoStr = getLocalStorage('userInfo');
+    if (userInfoStr) {
+      form.fullName = userInfoStr.fullName || '';
+      form.email = userInfoStr.email || '';
+      form.phone = userInfoStr.phone || '';
+    }
   } catch (error: any) {
     console.error('Lỗi tải thông tin:', error);
     showToast('error', 'Không thể tải thông tin người dùng');
@@ -546,23 +536,13 @@ const resetFindRoomForm = () => {
 };
 
 // Update profile
-const handleUpdateProfile = async (data?: {
-  fullName: string;
-  phone: string;
-}) => {
+const handleUpdateProfile = async () => {
   loading.value = true;
 
   try {
-    const updateData = data || {
-      fullName: form.fullName,
-      phone: form.phone,
-    };
-
-    // Mock update - giả lập delay API
-
-    form.fullName = updateData.fullName;
-    form.phone = updateData.phone;
-
+    // Load lại profile từ localStorage sau khi ProfileEditModal đã cập nhật thành công
+    await loadProfile();
+    
     showToast('success', 'Cập nhật thông tin thành công!');
     showEditModal.value = false;
   } catch (error: any) {
@@ -573,7 +553,10 @@ const handleUpdateProfile = async (data?: {
   }
 };
 
-await loadProfile();
+if (process.client) {
+  await loadProfile();
+}
+
 
 // Load posts với error handling
 await loadUserPosts().catch(error => {
@@ -600,7 +583,7 @@ onUnmounted(() => {
               <!-- Avatar -->
               <div class="avatar mb-4">
                 <div class="w-20 rounded-full">
-                  <img src="/images/default-avatar.png" alt="User Avatar" />
+                  <img :src="getMediaUrl(userInfo.avatar)"  @error="$event.target.src = '/images/default-avatar.png'" alt="User Avatar" />
                 </div>
               </div>
 
@@ -962,9 +945,8 @@ onUnmounted(() => {
     <ProfileEditModal
       :show="showEditModal"
       :initial-data="form"
-      @close="showEditModal = false"
-      @update="handleUpdateProfile"
-    />
+      @close="handleUpdateProfile"
+      />
 
     <!-- Toast Notifications -->
     <ClientOnly>

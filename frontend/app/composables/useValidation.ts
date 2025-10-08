@@ -13,7 +13,7 @@ export const useValidationSchema = () => {
       phone: yup
         .string()
         .required(t('auth.validation.phoneRequired'))
-        .matches(/^[0-9]+$/, t('auth.validation.phoneInvalid'))
+        .matches(/^(\+84|0)[0-9]{8,9}$/, t('auth.validation.phoneInvalid'))
         .min(8, t('auth.validation.phoneMin'))
         .max(15, t('auth.validation.phoneMax')),
       fullName: yup
@@ -22,7 +22,7 @@ export const useValidationSchema = () => {
         .min(2, t('auth.validation.nameMin'))
         .max(50, t('auth.validation.nameMax'))
         .matches(
-          /^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂÂÊÔƯăâêôư\s]+$/,
+          /^[a-zA-ZÀ-ỹ\s]+$/,
           t('auth.validation.nameAlpha')
         )
         .test(
@@ -275,10 +275,81 @@ export const useValidationSchema = () => {
     })
   );
 
+  // Profile edit validation schema
+  const profileEditSchema = computed(() =>
+    yup.object({
+      fullName: yup
+        .string()
+        .required(t('auth.validation.nameRequired'))
+        .min(2, t('auth.validation.nameMin'))
+        .max(50, t('auth.validation.nameMax'))
+        .matches(
+          /^[a-zA-ZÀ-ỹ\s]+$/,
+          t('auth.validation.nameAlpha')
+        )
+        .test(
+          'no-only-spaces',
+          t('auth.validation.nameNoSpaces'),
+          function (value) {
+            if (!value) return true; // Let required handle empty values
+            return value.trim().length > 0;
+          }
+        ),
+      phone: yup
+        .string()
+        .required(t('profile.validation.phoneRequired'))
+        .matches(/^[0-9]{10,11}$/, t('profile.validation.phoneInvalid')),
+    })
+  );
+
+  // Profile edit validation schema with phone exists check
+  const createProfileEditSchemaWithPhoneCheck = (checkPhoneExistsFn: (phone: string) => Promise<boolean>, currentPhone?: string) =>
+    computed(() =>
+      yup.object({
+        fullName: yup
+          .string()
+          .required(t('auth.validation.nameRequired'))
+          .min(2, t('auth.validation.nameMin'))
+          .max(50, t('auth.validation.nameMax'))
+          .matches(
+            /^[a-zA-ZÀ-ỹ\s]+$/,
+            t('auth.validation.nameAlpha')
+          )
+          .test(
+            'no-only-spaces',
+            t('auth.validation.nameNoSpaces'),
+            function (value) {
+              if (!value) return true; // Let required handle empty values
+              return value.trim().length > 0;
+            }
+          ),
+        phone: yup
+          .string()
+          .required(t('profile.validation.phoneRequired'))
+          .matches(/^[0-9]{10,11}$/, t('profile.validation.phoneInvalid'))
+          .test('phone-exists', t('profile.validation.phoneExists'), async function(value) {
+            if (!value || value === currentPhone) {
+              return true;
+            }
+            
+            try {
+              const exists = await checkPhoneExistsFn(value);
+              // API trả về true khi số chưa tồn tại (có thể sử dụng)
+              // API trả về false khi số đã tồn tại (không thể sử dụng)
+              return exists; // exists = true → validation pass, exists = false → validation fail
+            } catch (error) {
+              return true; // Don't block on API errors
+            }
+          }),
+      })
+    );
+
   return {
     registerSchema,
     loginSchema,
     postFormSchema,
     findRoomSchema,
+    profileEditSchema,
+    createProfileEditSchemaWithPhoneCheck,
   };
 };

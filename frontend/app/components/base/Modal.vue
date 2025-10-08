@@ -121,7 +121,7 @@ watch(
           <!-- Modal Header -->
           <div
             v-if="title || closable"
-            class="flex items-center justify-between p-6 border-b border-gray-200"
+            class="flex items-center justify-between px-6 py-3 border-b border-gray-200"
           >
             <h3 v-if="title" class="text-lg font-semibold text-gray-900">
               {{ title }}

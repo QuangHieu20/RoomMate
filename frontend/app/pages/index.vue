@@ -424,24 +424,26 @@ const handleContact = postId => {
     </div>
     <div class="w-4/12 pt-[70px]">
       <!-- Login/Register Card -->
-      <div
-        v-if="!isAuthenticated"
-        class="w-[95%] ml-3 card bg-base-100 p-6 mb-8"
-      >
-        <h2 class="card-title text-xl font-bold mb-2">
-          Đăng nhập hoặc đăng ký RoomMate
-        </h2>
-        <p class="text-base-content/70 mb-4">
-          Kết nối với mọi người, tìm bạn cùng phòng lý tưởng và bắt đầu trò
-          chuyện ngay hôm nay!
-        </p>
-        <NuxtLink
-          href="/login"
-          class="btn w-full bg-cyan-500 hover:bg-cyan-600 border-cyan-500 text-white"
+      <ClientOnly>
+        <div
+          v-if="!isAuthenticated"
+          class="w-[95%] ml-3 card bg-base-100 p-6 mb-8"
         >
-          Đăng nhập hoặc đăng ký
-        </NuxtLink>
-      </div>
+          <h2 class="card-title text-xl font-bold mb-2">
+            Đăng nhập hoặc đăng ký RoomMate
+          </h2>
+          <p class="text-base-content/70 mb-4">
+            Kết nối với mọi người, tìm bạn cùng phòng lý tưởng và bắt đầu trò
+            chuyện ngay hôm nay!
+          </p>
+          <NuxtLink
+            href="/login"
+            class="btn w-full bg-cyan-500 hover:bg-cyan-600 border-cyan-500 text-white"
+          >
+            Đăng nhập hoặc đăng ký
+          </NuxtLink>
+        </div>
+      </ClientOnly>
 
       <!-- Filter Section -->
       <div class="w-[95%] ml-3 card">

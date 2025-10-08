@@ -5,6 +5,7 @@ import {
   ChatBubbleLeftRightIcon,
   PencilIcon,
 } from '@heroicons/vue/24/outline';
+const { getMediaUrl } = useApiUrl();
 
 // Auth composable
 const { isAuthenticated, currentUser, removeToken } = useAuth();
@@ -95,7 +96,7 @@ const closeDropdown = () => {
             class="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 transition-colors"
           >
             <img
-              :src="currentUser?.avatar || '/images/default-avatar.png'"
+              :src="getMediaUrl(currentUser?.avatar) || '/images/default-avatar.png'"
               :alt="currentUser?.fullName"
               class="w-8 h-8 rounded-full object-cover border-2 border-gray-200"
               @error="$event.target.src = '/images/default-avatar.png'"
