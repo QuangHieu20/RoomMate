@@ -1,3 +1,74 @@
+<script setup lang="ts">
+import type { RegisterDto, ToastMessage } from '~/types';
+import { useValidationSchema } from '~/composables/useValidation';
+import { toTypedSchema } from '@vee-validate/yup';
+
+definePageMeta({
+  layout: 'auth',
+});
+// Composable
+const { register } = useAuth();
+const router = useRouter();
+
+// Validation schema với i18n (useI18n() được gọi bên trong)
+const { registerSchema } = useValidationSchema();
+const validationSchema = computed(() => toTypedSchema(registerSchema.value));
+
+// i18n cho UI
+const { t } = useI18n();
+
+
+// UI state
+const loading = ref(false);
+const showPassword = ref(false);
+
+// Toast state
+const toast = reactive<ToastMessage & { show: boolean }>({
+  show: false,
+  type: 'info',
+  message: '',
+  duration: 3000,
+});
+
+// Show toast function
+const showToast = (
+    type: ToastMessage['type'],
+    message: string,
+    duration = 3000
+) => {
+  toast.type = type;
+  toast.message = message;
+  toast.duration = duration;
+  toast.show = true;
+
+  setTimeout(() => {
+    toast.show = false;
+  }, duration);
+};
+
+// Handle register
+const handleRegister = async (values: RegisterDto | unknown) => {
+  try {
+    loading.value = true;
+
+    // Call API (token automatically saved to HttpOnly cookie by backend)
+    const response = await register(values as RegisterDto);
+    if (response.data.user.id) {
+      // Show success toast
+      showToast('success', t('auth.messages.registerSuccess'));
+      await router.push('/');
+    }
+  } catch (error: any) {
+    console.error('Lỗi đăng ký:', error);
+
+    // Show error toast with specific error message
+    const errorMessage = error.message || t('auth.messages.registerError');
+    showToast('error', errorMessage);
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
 <template>
   <div class="w-full h-full bg-white p-4 sm:p-6 lg:p-8">
     <!-- Logo -->
@@ -300,75 +371,3 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import type { RegisterDto, ToastMessage } from '~/types';
-import { useValidationSchema } from '~/composables/useValidation';
-import { toTypedSchema } from '@vee-validate/yup';
-
-definePageMeta({
-  layout: 'auth',
-});
-// Composable
-const { register } = useAuth();
-const router = useRouter();
-
-// Validation schema với i18n (useI18n() được gọi bên trong)
-const { registerSchema } = useValidationSchema();
-const validationSchema = computed(() => toTypedSchema(registerSchema.value));
-
-// i18n cho UI
-const { t } = useI18n();
-
-// i18n Composition API (thay thế Options API cũ)
-
-// UI state
-const loading = ref(false);
-const showPassword = ref(false);
-
-// Toast state
-const toast = reactive<ToastMessage & { show: boolean }>({
-  show: false,
-  type: 'info',
-  message: '',
-  duration: 3000,
-});
-
-// Show toast function
-const showToast = (
-  type: ToastMessage['type'],
-  message: string,
-  duration = 3000
-) => {
-  toast.type = type;
-  toast.message = message;
-  toast.duration = duration;
-  toast.show = true;
-
-  setTimeout(() => {
-    toast.show = false;
-  }, duration);
-};
-
-// Handle register
-const handleRegister = async (values: RegisterDto | unknown) => {
-  try {
-    loading.value = true;
-
-    // Call API (token automatically saved to HttpOnly cookie by backend)
-    const response = await register(values as RegisterDto);
-    if (response.data.access_token) {
-      // Show success toast
-      showToast('success', t('auth.messages.registerSuccess'));
-      await router.push('/');
-    }
-  } catch (error: any) {
-    console.error('Lỗi đăng ký:', error);
-
-    // Show error toast with specific error message
-    const errorMessage = error.message || t('auth.messages.registerError');
-    showToast('error', errorMessage);
-  } finally {
-    loading.value = false;
-  }
-};
-</script>

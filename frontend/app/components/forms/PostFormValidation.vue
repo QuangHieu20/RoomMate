@@ -4,7 +4,7 @@
       {{ $t('post.create.title') }}
     </h2>
 
-    <VForm
+    <VeeForm
       :validation-schema="validationSchema"
       @submit="handleSubmit"
       class="space-y-4"
@@ -83,7 +83,7 @@
           }}
         </button>
       </div>
-    </VForm>
+    </VeeForm>
   </div>
 </template>
 

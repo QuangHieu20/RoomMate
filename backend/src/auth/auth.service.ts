@@ -34,6 +34,7 @@ export class AuthService {
       email: user.email,
       fullName: user.fullName || user.email.split('@')[0], // Use fullName or fallback to email prefix
       avatar: user.avatar,
+      phone: user.phone,
     };
   }
 

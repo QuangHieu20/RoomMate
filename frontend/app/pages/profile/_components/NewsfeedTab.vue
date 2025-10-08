@@ -283,7 +283,7 @@ const handleDeletePost = (postId: string) => {
             </div>
 
             <!-- Post Content -->
-            <div class="mb-4">
+            <div class="mb-4 flex flex-col text-left">
               <h3 class="text-lg font-bold text-base-content mb-2">
                 {{ post.title }}
               </h3>

@@ -6,7 +6,6 @@ import { PostStatus } from '@/common/types/enums';
 import * as fs from 'fs';
 import * as path from 'path';
 import { randomUUID } from 'crypto';
-import { Express } from 'express';
 
 @Injectable()
 export class PostsService {

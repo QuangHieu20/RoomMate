@@ -69,7 +69,7 @@ export class AuthController {
 
     // Return only user data, no token in response
     return {
-      user: user,
+      user,
     };
   }
 

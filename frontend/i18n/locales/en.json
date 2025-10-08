@@ -225,6 +225,11 @@
     "logout": "Logout"
   },
   "profile": {
+    "validation": {
+      "phoneRequired": "Please enter phone number",
+      "phoneInvalid": "Invalid phone number",
+      "phoneExists": "Phone number is already in use"
+    },
     "tabs": {
       "newsfeed": "Newsfeed",
       "notifications": "Notifications",
