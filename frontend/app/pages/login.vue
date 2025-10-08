@@ -90,9 +90,10 @@ const handleLogin = async (values: LoginDto | unknown) => {
 
     <!-- Header -->
     <div class="mb-6 sm:mb-8 max-w-[90%] sm:max-w-[80%] mx-auto">
-      <h2 class="text-2xl sm:text-3xl font-bold text-red-800 mb-3 sm:mb-4">
+      <h2 class="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4" style="color: #000000;">
         {{ t('auth.login.title') }}
       </h2>
+
       <p class="text-gray-600 text-sm sm:text-base leading-relaxed">
         {{ t('auth.login.subtitle', { brand: t('brand.name') }) }}<br />
         {{ t('auth.login.subtitle2') }}
